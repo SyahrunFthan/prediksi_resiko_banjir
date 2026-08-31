@@ -1,0 +1,8 @@
+flask
+pandas
+geopandas
+scikit-learn
+joblib
+shapely
+matplotlib
+requests

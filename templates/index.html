@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prediksi & Visualisasi Peta Risiko Banjir Sulawesi Tengah</title>
+    <meta
+      name="description"
+      content="Aplikasi web prediksi banjir berbasis data cuaca, Machine Learning Random Forest, dan GeoPandas spasial map Sulawesi Tengah."
+    />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Leaflet CSS & JS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"
+    />
+
+    <!-- Custom CSS -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+
+    <!-- Chart.js & Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- Top Navbar Header -->
+      <header class="app-header">
+        <div class="brand">
+          <span class="logo-icon">🌊</span>
+          <div>
+            <h1>System Prediksi & Visualisasi Peta Risiko Banjir</h1>
+            <p class="subtitle">
+              Provinsi Sulawesi Tengah • Powered by GeoPandas & Random Forest ML
+            </p>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Layout Grid -->
+      <div class="layout-body">
+        <!-- Sidebar Controls -->
+        <aside class="sidebar">
+          <div class="filter-card">
+            <h3>🔍 Filter Data Geospasial</h3>
+            <div class="form-group">
+              <label for="filterKabupaten">Kabupaten / Kota:</label>
+              <select id="filterKabupaten" class="custom-select">
+                <option value="all">Semua Kabupaten/Kota</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="filterRisk">Tingkat Risiko Banjir:</label>
+              <select id="filterRisk" class="custom-select">
+                <option value="all">Semua Risiko</option>
+                <option value="Tinggi">🔴 Tinggi (Siaga)</option>
+                <option value="Sedang">🟡 Sedang (Waspada)</option>
+                <option value="Rendah">🟢 Rendah (Aman)</option>
+              </select>
+            </div>
+            <button id="btnApplyFilter" class="btn btn-primary btn-block">
+              Terapkan Filter
+            </button>
+          </div>
+
+          <div class="info-card">
+            <h4>ℹ️ Panduan Indikator</h4>
+            <ul class="legend-list">
+              <li>
+                <span class="badge-dot red"></span> <b>Tinggi (Siaga)</b>: Curah
+                hujan / kelembapan & tutupan awan sangat tinggi.
+              </li>
+              <li>
+                <span class="badge-dot yellow"></span> <b>Sedang (Waspada)</b>:
+                Kelembapan meningkat & cuaca berawan.
+              </li>
+              <li>
+                <span class="badge-dot green"></span> <b>Rendah (Aman)</b>:
+                Cuaca stabil & cerah.
+              </li>
+            </ul>
+          </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="content-area">
+          <!-- KPI Summary Cards -->
+          <section class="summary-cards">
+            <div class="card metric-card">
+              <span class="card-label">Total Data Cuaca</span>
+              <h2 id="valTotalData">-</h2>
+              <span class="card-sub">13 Kabupaten / Kota</span>
+            </div>
+            <div class="card metric-card border-red">
+              <span class="card-label">🔴 Risiko Tinggi (Siaga)</span>
+              <h2 id="valHighRisk" class="text-red">-</h2>
+              <span id="pctHighRisk" class="badge badge-red">-</span>
+            </div>
+            <div class="card metric-card border-yellow">
+              <span class="card-label">🟡 Risiko Sedang (Waspada)</span>
+              <h2 id="valMedRisk" class="text-yellow">-</h2>
+              <span id="pctMedRisk" class="badge badge-yellow">-</span>
+            </div>
+            <div class="card metric-card border-green">
+              <span class="card-label">🟢 Risiko Rendah (Aman)</span>
+              <h2 id="valLowRisk" class="text-green">-</h2>
+              <span id="pctLowRisk" class="badge badge-green">-</span>
+            </div>
+          </section>
+
+          <!-- Navigation Tabs -->
+          <nav class="tab-nav">
+            <button class="tab-btn active" data-tab="tabMap">
+              🗺️ Peta Interaktif GeoPandas
+            </button>
+            <button class="tab-btn" data-tab="tabPredict">
+              🔮 Simulasi Prediksi Real-Time
+            </button>
+            <button class="tab-btn" data-tab="tabAnalytics">
+              📊 Dashboard Analitik
+            </button>
+            <button class="tab-btn" data-tab="tabData">
+              📄 Explorer Data & Ekspor
+            </button>
+          </nav>
+
+          <!-- TAB 1: PETA INTERAKTIF LEAFLET & GEOPANDAS -->
+          <section id="tabMap" class="tab-pane active">
+            <div class="card map-card">
+              <div class="card-header">
+                <h3>
+                  🗺️ Visualisasi Peta Spasial Risiko Banjir Sulawesi Tengah
+                </h3>
+                <p>
+                  Layer boundary administratif Sulawesi Tengah diolah dari
+                  <b>GeoPandas</b> dengan penanda sebaran titik pemantauan
+                  cuaca.
+                </p>
+              </div>
+              <div id="mapContainer"></div>
+            </div>
+          </section>
+
+          <!-- TAB 2: SIMULASI PREDIKSI REAL-TIME -->
+          <section id="tabPredict" class="tab-pane">
+            <div class="card form-card">
+              <div class="card-header">
+                <h3>🔮 Kalkulator & Simulasi Prediksi Banjir Real-Time</h3>
+                <p>
+                  Masukkan parameter cuaca kustom untuk menguji prediksi tingkat
+                  risiko banjir berbasis Machine Learning <b>Random Forest</b>.
+                </p>
+              </div>
+              <form id="predictionForm" class="pred-grid">
+                <div class="form-col">
+                  <div class="form-group">
+                    <label for="pSuhu"
+                      >🌡️ Suhu Udara (°C):
+                      <span id="valSuhuLbl">27</span>°C</label
+                    >
+                    <input
+                      type="range"
+                      id="pSuhu"
+                      min="15"
+                      max="40"
+                      value="27"
+                      step="0.5"
+                      class="slider"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label for="pKelembapan"
+                      >💧 Kelembapan Udara (%):
+                      <span id="valKelembapanLbl">85</span>%</label
+                    >
+                    <input
+                      type="range"
+                      id="pKelembapan"
+                      min="30"
+                      max="100"
+                      value="85"
+                      step="1"
+                      class="slider"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label for="pAwan"
+                      >☁️ Tutupan Awan (%):
+                      <span id="valAwanLbl">75</span>%</label
+                    >
+                    <input
+                      type="range"
+                      id="pAwan"
+                      min="0"
+                      max="100"
+                      value="75"
+                      step="5"
+                      class="slider"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label for="pAngin"
+                      >💨 Kecepatan Angin (km/h):
+                      <span id="valAnginLbl">15</span> km/h</label
+                    >
+                    <input
+                      type="range"
+                      id="pAngin"
+                      min="0"
+                      max="60"
+                      value="15"
+                      step="1"
+                      class="slider"
+                    />
+                  </div>
+                </div>
+                <div class="form-col">
+                  <div class="form-group">
+                    <label for="pKodeCuaca">🌧️ Kondisi Cuaca:</label>
+                    <select id="pKodeCuaca" class="custom-select">
+                      <option value="0">0 - Cerah</option>
+                      <option value="1">1 - Cerah Berawan</option>
+                      <option value="3">3 - Berawan</option>
+                      <option value="45">45 - Kabut / Asap</option>
+                      <option value="61" selected>
+                        61 - Hujan Ringan / Hujan Sedang
+                      </option>
+                      <option value="95">
+                        95 - Hujan Petir / Cuaca Ekstrem
+                      </option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="pJam"
+                      >⏰ Waktu / Jam (0-23):
+                      <span id="valJamLbl">14</span>:00</label
+                    >
+                    <input
+                      type="range"
+                      id="pJam"
+                      min="0"
+                      max="23"
+                      value="14"
+                      step="1"
+                      class="slider"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label for="pBulan"
+                      >📅 Bulan (1-12): <span id="valBulanLbl">8</span></label
+                    >
+                    <input
+                      type="range"
+                      id="pBulan"
+                      min="1"
+                      max="12"
+                      value="8"
+                      step="1"
+                      class="slider"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label for="pKabupaten">📍 Lokasi Kabupaten:</label>
+                    <select id="pKabupaten" class="custom-select"></select>
+                  </div>
+                </div>
+                <div class="full-width">
+                  <button type="submit" class="btn btn-accent btn-block">
+                    🚀 Jalankan Prediksi Risiko Banjir
+                  </button>
+                </div>
+              </form>
+
+              <!-- Prediction Output Result Card -->
+              <div id="resultBox" class="result-box hidden">
+                <div class="result-header">
+                  <h4>🎯 Hasil Prediksi Model Machine Learning</h4>
+                </div>
+                <div class="result-body">
+                  <div id="resBadgeBox" class="result-badge-container"></div>
+                  <div class="prob-container">
+                    <h5>Probabilitas Kategori Risiko:</h5>
+                    <div class="prob-row">
+                      <span>🔴 Risiko Tinggi:</span>
+                      <div class="progress-bar">
+                        <div id="barTinggi" class="progress-fill red"></div>
+                      </div>
+                      <span id="valTinggi">0%</span>
+                    </div>
+                    <div class="prob-row">
+                      <span>🟡 Risiko Sedang:</span>
+                      <div class="progress-bar">
+                        <div id="barSedang" class="progress-fill yellow"></div>
+                      </div>
+                      <span id="valSedang">0%</span>
+                    </div>
+                    <div class="prob-row">
+                      <span>🟢 Risiko Rendah:</span>
+                      <div class="progress-bar">
+                        <div id="barRendah" class="progress-fill green"></div>
+                      </div>
+                      <span id="valRendah">0%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- TAB 3: DASHBOARD ANALYTICS -->
+          <section id="tabAnalytics" class="tab-pane">
+            <div class="analytics-grid">
+              <div class="card chart-card">
+                <h3>🏢 Sebaran Risiko Banjir per Kabupaten</h3>
+                <canvas id="chartKabupaten"></canvas>
+              </div>
+              <div class="card chart-card">
+                <h3>☁️ Distribusi Jenis Cuaca</h3>
+                <canvas id="chartWeather"></canvas>
+              </div>
+              <div class="card chart-card full-width">
+                <h3>🧠 Machine Learning Feature Importance</h3>
+                <canvas id="chartFeatureImportance"></canvas>
+              </div>
+            </div>
+          </section>
+
+          <!-- TAB 4: DATA EXPLORER & EKSPOR -->
+          <section id="tabData" class="tab-pane">
+            <div class="card data-card">
+              <div class="table-actions">
+                <input
+                  type="text"
+                  id="tableSearch"
+                  placeholder="🔍 Cari Kabupaten, Kecamatan, Desa..."
+                  class="search-input"
+                />
+                <a href="/api/export-csv" class="btn btn-secondary"
+                  >📥 Unduh Data CSV</a
+                >
+              </div>
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Kabupaten/Kota</th>
+                      <th>Kecamatan</th>
+                      <th>Desa/Kelurahan</th>
+                      <th>Suhu (°C)</th>
+                      <th>Kelembapan (%)</th>
+                      <th>Awan (%)</th>
+                      <th>Deskripsi Cuaca</th>
+                      <th>Risiko Banjir</th>
+                      <th>Risk Score</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tableBody">
+                    <tr>
+                      <td colspan="9" class="text-center">Memuat data...</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="pagination-controls">
+                <button id="btnPrevPage" class="btn btn-sm btn-secondary">
+                  Previous
+                </button>
+                <span id="pageInfo">Halaman 1 dari 1</span>
+                <button id="btnNextPage" class="btn btn-sm btn-secondary">
+                  Next
+                </button>
+              </div>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <!-- Custom JavaScript -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  </body>
+</html>

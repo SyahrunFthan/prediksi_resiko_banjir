@@ -5,6 +5,7 @@ Aplikasi web berbasis Python untuk memprediksi dan memvisualisasikan risiko banj
 ## Deskripsi proyek
 
 Proyek ini menampilkan:
+
 - Dashboard analitik risiko banjir wilayah Sulawesi Tengah
 - Peta interaktif berbasis Leaflet dan GeoPandas
 - Simulasi prediksi real-time berdasarkan parameter cuaca
@@ -57,15 +58,17 @@ Proyek ini menampilkan:
 ## Cara download / clone repository
 
 ### Opsi 1: Download ZIP dari GitHub
+
 1. Buka halaman repository di GitHub.
 2. Klik tombol Code.
 3. Pilih Download ZIP.
 4. Ekstrak file hasil unduhan ke folder kerja Anda.
 
 ### Opsi 2: Clone via Git
+
 ```bash
-git clone https://github.com/<username>/<nama-repo>.git
-cd <nama-repo>
+git clone https://github.com/SyahrunFthan/prediksi_resiko_banjir.git
+cd prediksi_resiko_banjir
 ```
 
 Jika repositori sudah Anda miliki secara lokal, cukup masuk ke folder proyek.
@@ -73,6 +76,7 @@ Jika repositori sudah Anda miliki secara lokal, cukup masuk ke folder proyek.
 ## Cara install dependency
 
 ### Linux / macOS
+
 ```bash
 python3 -m venv venv
 source venv/bin/activate
@@ -80,6 +84,7 @@ pip install -r requirements.txt
 ```
 
 ### Windows (PowerShell)
+
 ```powershell
 python -m venv venv
 .\venv\Scripts\Activate.ps1
@@ -89,39 +94,48 @@ pip install -r requirements.txt
 ## Cara menjalankan aplikasi
 
 ### 1. Jalankan server Flask
+
 ```bash
 python app.py
 ```
 
 Atau jika menggunakan Flask CLI:
+
 ```bash
 flask --app app.py run
 ```
 
 ### 2. Buka browser
+
 Setelah server aktif, buka alamat berikut:
 
 ```text
-http://127.0.0.1:5000
+http://127.0.0.1:5050
 ```
 
 ## Penjelasan penggunaan aplikasi
 
 ### A. Dashboard utama
+
 Pada halaman utama, Anda akan melihat:
+
 - Ringkasan total data cuaca
 - Jumlah risiko tinggi, sedang, dan rendah
 - Peta interaktif wilayah Sulawesi Tengah
 - Grafik analitik berdasarkan kabupaten dan cuaca
 
 ### B. Filter data
+
 Gunakan panel filter pada sisi kiri untuk:
+
 - Memilih kabupaten/kota tertentu
 - Menyaring berdasarkan kategori risiko: Rendah / Sedang / Tinggi
 - Menerapkan perubahan ke peta dan ringkasan data
 
 ### C. Simulasi prediksi
+
 Pilih tab "Simulasi Prediksi Real-Time" dan masukkan parameter cuaca seperti:
+
 - Suhu udara
 - Kelembapan
 - Tutupan awan
@@ -130,12 +144,15 @@ Pilih tab "Simulasi Prediksi Real-Time" dan masukkan parameter cuaca seperti:
 - Jam dan bulan
 
 Sistem akan memproses input dan menampilkan:
+
 - Kategori prediksi (Rendah, Sedang, Tinggi)
 - Probabilitas setiap kelas
 - Fitur yang dipakai model
 
 ### D. Explorer data
+
 Pada tab data, Anda dapat:
+
 - Melihat tabel data cuaca
 - Mencari berdasarkan wilayah atau cuaca
 - Mengubah halaman data
@@ -144,14 +161,19 @@ Pada tab data, Anda dapat:
 ## Model dan dataset
 
 ### Dataset
+
 File dataset yang digunakan adalah:
+
 ```text
 dataset_cuaca_sulawesi_tengah.csv
 ```
+
 Dataset berisi data cuaca dan koordinat geografis yang digunakan untuk menilai kondisi banjir di wilayah Sulawesi Tengah.
 
 ### Model
+
 Model dilatih oleh script:
+
 ```bash
 python train_model.py
 ```
@@ -175,18 +197,23 @@ GET /api/export-csv
 ## Troubleshooting
 
 ### Error modul tidak ditemukan
+
 ```bash
 pip install -r requirements.txt
 ```
 
 ### Model belum tersedia
+
 Jalankan:
+
 ```bash
 python train_model.py
 ```
 
 ### Port sudah dipakai
+
 Gunakan port alternatif:
+
 ```bash
 flask --app app.py run --port 5001
 ```

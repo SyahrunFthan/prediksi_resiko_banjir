@@ -7,8 +7,10 @@ from flask import Flask, render_template, jsonify, request, Response, send_file
 
 from train_model import load_and_preprocess_data, MODEL_PATH
 from geo_utils import get_sulteng_geojson_dict, convert_weather_df_to_gdf
+from dotenv import load_dotenv 
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
+load_dotenv()
 
 # Cache loaded data and model in app scope
 DATA = None
@@ -28,7 +30,8 @@ def get_data_and_model():
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    map_api_key = os.getenv('MAP_API_KEY', '')
+    return render_template('index.html', map_api_key=map_api_key)
 
 @app.route('/api/summary')
 def api_summary():
@@ -52,13 +55,18 @@ def api_summary():
 
     return jsonify({
         'total_records': total_records,
+        'total_data': total_records,
         'high_count': high_count,
+        'high_risk_count': high_count,
         'med_count': med_count,
+        'med_risk_count': med_count,
         'low_count': low_count,
+        'low_risk_count': low_count,
         'high_pct': round((high_count / max(1, total_records)) * 100, 1),
         'med_pct': round((med_count / max(1, total_records)) * 100, 1),
         'low_pct': round((low_count / max(1, total_records)) * 100, 1),
-        'kabupaten_options': kab_list
+        'kabupaten_options': kab_list,
+        'kabupaten_list': kab_list
     })
 
 @app.route('/api/geojson/boundary')
@@ -73,7 +81,7 @@ def api_weather_points():
 
     kabupaten_param = request.args.get('kabupaten', 'all')
     risk_param = request.args.get('risk', 'all')
-    limit = int(request.args.get('limit', 1200))
+    limit = int(request.args.get('limit', 2000))
 
     filtered_df = df.dropna(subset=['latitude', 'longitude']).copy()
     if kabupaten_param != 'all':
@@ -81,7 +89,17 @@ def api_weather_points():
     if risk_param != 'all':
         filtered_df = filtered_df[filtered_df['kategori_risiko'] == risk_param]
 
-    sample_df = filtered_df.head(limit)
+    # Prioritize highest risk observation per unique location so every desa is represented
+    # across all 13 kabupaten without overlapping duplicates
+    sorted_df = filtered_df.sort_values(by=['risk_score'], ascending=False)
+    unique_points_df = sorted_df.drop_duplicates(subset=['latitude', 'longitude'])
+
+    if len(unique_points_df) > limit:
+        sample_df = unique_points_df.groupby('kabupaten_kota', group_keys=False).apply(
+            lambda x: x.head(max(1, int(limit * len(x) / len(unique_points_df))))
+        ).head(limit)
+    else:
+        sample_df = unique_points_df
 
     points = []
     for idx, row in sample_df.iterrows():
@@ -229,4 +247,4 @@ if __name__ == '__main__':
     # Initialize data on startup
     get_data_and_model()
     print("Starting Flask web server on http://localhost:5050...")
-    app.run(host='0.0.0.0', port=5050, debug=False)
+    app.run(host='0.0.0.0', port=5050, debug=True)

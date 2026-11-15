@@ -1,498 +1,1097 @@
+/* ==========================================================================
+   SULTENG GEO-HYDRO — EDITORIAL BOTANICAL LUXURY THEME
+   Inspired by the "Regal Crest" Editorial Design Reference
+   Palette: Warm Alabaster Cream (#FAF8F2) & Deep Forest Moss (#344726)
+   Typography: Cormorant Garamond (Display Serif) + Plus Jakarta Sans (UI)
+   ========================================================================== */
+
 :root {
-    --bg-main: #0b0f19;
-    --bg-card: #151c2c;
-    --bg-card-hover: #1e293b;
-    --border-color: #27354a;
-    --text-main: #f1f5f9;
-    --text-muted: #94a3b8;
-    --accent-blue: #3b82f6;
-    --accent-blue-hover: #2563eb;
-    --red: #ef4444;
-    --yellow: #f59e0b;
-    --green: #10b981;
-    --font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-heading: 'Outfit', sans-serif;
+  --cream-bg: #FAF8F2;
+  --cream-surface: #F3EFE4;
+  --cream-card: #EFECE1;
+  --cream-border: #DED9C8;
+
+  --forest-main: #344726;
+  --forest-dark: #223018;
+  --forest-deep: #16200F;
+  --forest-muted: #4A5D3B;
+
+  --text-dark: #212E18;
+  --text-olive: #5A6451;
+  --text-light: #FAF8F2;
+  --text-cream-muted: rgba(250, 248, 242, 0.76);
+
+  --risk-high: #B83B2B;
+  --risk-high-bg: rgba(184, 59, 43, 0.12);
+  --risk-high-border: rgba(184, 59, 43, 0.32);
+
+  --risk-med: #C47A1B;
+  --risk-med-bg: rgba(196, 122, 27, 0.14);
+  --risk-med-border: rgba(196, 122, 27, 0.34);
+
+  --risk-low: #344726;
+  --risk-low-bg: rgba(52, 71, 38, 0.12);
+  --risk-low-border: rgba(52, 71, 38, 0.32);
+
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --radius-card: 20px;
+  --radius-lg: 24px;
+  --radius-sheet: 48px;
+  --radius-pill: 9999px;
 }
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-    background-color: var(--bg-main);
-    color: var(--text-main);
-    font-family: var(--font-main);
-    font-size: 14px;
-    line-height: 1.5;
-}
-
-.app-container {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
-
-/* Header Navbar */
-.app-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 28px;
-    background: #0f172a;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.brand {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-}
-
-.logo-icon {
-    font-size: 32px;
-}
-
-.brand h1 {
-    font-family: var(--font-heading);
-    font-size: 20px;
-    font-weight: 700;
-    color: #ffffff;
-}
-
-.subtitle {
-    color: var(--text-muted);
-    font-size: 12px;
-}
-
-.header-badges {
-    display: flex;
-    gap: 12px;
-}
-
-.live-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(16, 185, 129, 0.15);
-    color: var(--green);
-    border: 1px solid rgba(16, 185, 129, 0.3);
-    padding: 4px 12px;
-    border-radius: 999px;
-    font-weight: 600;
-    font-size: 12px;
-}
-
-.live-pill .dot {
-    width: 8px;
-    height: 8px;
-    background-color: var(--green);
-    border-radius: 50%;
-    animation: pulse 1.5s infinite;
-}
-
-.version-pill {
-    background: rgba(59, 130, 246, 0.15);
-    color: var(--accent-blue);
-    border: 1px solid rgba(59, 130, 246, 0.3);
-    padding: 4px 12px;
-    border-radius: 999px;
-    font-size: 12px;
-}
-
-@keyframes pulse {
-    0% { transform: scale(0.95); opacity: 0.8; }
-    50% { transform: scale(1.15); opacity: 1; }
-    100% { transform: scale(0.95); opacity: 0.8; }
-}
-
-/* Layout Body */
-.layout-body {
-    display: flex;
-    flex: 1;
-}
-
-.sidebar {
-    width: 300px;
-    background: #0f172a;
-    border-right: 1px solid var(--border-color);
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.content-area {
-    flex: 1;
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    overflow-x: hidden;
-}
-
-/* Cards & Forms */
-.card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
-}
-
-.filter-card h3, .info-card h4 {
-    font-family: var(--font-heading);
-    margin-bottom: 14px;
-    font-size: 15px;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    margin-bottom: 14px;
-}
-
-.form-group label {
-    font-weight: 500;
-    color: var(--text-muted);
-    font-size: 13px;
-}
-
-.custom-select, .search-input {
-    background: #0b0f19;
-    border: 1px solid var(--border-color);
-    color: var(--text-main);
-    padding: 10px 12px;
-    border-radius: 8px;
-    font-size: 13px;
-    outline: none;
-    transition: border-color 0.2s;
-    width: 100%;
-}
-
-.custom-select:focus, .search-input:focus {
-    border-color: var(--accent-blue);
-}
-
-.btn {
-    border: none;
-    border-radius: 8px;
-    padding: 10px 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
-    font-size: 13px;
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    text-decoration: none;
-}
-
-.btn:active {
-    transform: scale(0.98);
-}
-
-.btn-primary {
-    background: var(--accent-blue);
-    color: #ffffff;
-}
-
-.btn-primary:hover {
-    background: var(--accent-blue-hover);
-}
-
-.btn-accent {
-    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-    color: #ffffff;
-    padding: 12px;
-    font-size: 14px;
-}
-
-.btn-secondary {
-    background: #334155;
-    color: var(--text-main);
-}
-
-.btn-secondary:hover {
-    background: #475569;
-}
-
-.btn-block {
-    width: 100%;
-}
-
-/* Legend list */
-.legend-list {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.legend-list li {
-    font-size: 12px;
-    color: var(--text-muted);
-}
-
-.badge-dot {
-    display: inline-block;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    margin-right: 6px;
-}
-
-.badge-dot.red { background-color: var(--red); }
-.badge-dot.yellow { background-color: var(--yellow); }
-.badge-dot.green { background-color: var(--green); }
-
-/* Summary Metric Cards */
-.summary-cards {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-}
-
-.metric-card {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.card-label {
-    font-size: 12px;
-    color: var(--text-muted);
-    font-weight: 500;
-}
-
-.metric-card h2 {
-    font-family: var(--font-heading);
-    font-size: 26px;
-    font-weight: 700;
-}
-
-.card-sub {
-    font-size: 11px;
-    color: var(--text-muted);
-}
-
-.border-red { border-left: 4px solid var(--red); }
-.border-yellow { border-left: 4px solid var(--yellow); }
-.border-green { border-left: 4px solid var(--green); }
-
-.text-red { color: var(--red); }
-.text-yellow { color: var(--yellow); }
-.text-green { color: var(--green); }
-
-.badge {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: 11px;
-    font-weight: 600;
-    width: fit-content;
-}
-
-.badge-red { background: rgba(239, 68, 68, 0.2); color: var(--red); }
-.badge-yellow { background: rgba(245, 158, 11, 0.2); color: var(--yellow); }
-.badge-green { background: rgba(16, 185, 129, 0.2); color: var(--green); }
-
-/* Navigation Tabs */
-.tab-nav {
-    display: flex;
-    gap: 8px;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 2px;
-}
-
-.tab-btn {
-    background: transparent;
-    border: none;
-    color: var(--text-muted);
-    padding: 10px 18px;
-    font-weight: 600;
-    font-size: 13px;
-    cursor: pointer;
-    border-bottom: 3px solid transparent;
-    transition: all 0.2s;
-}
-
-.tab-btn:hover {
-    color: var(--text-main);
-}
-
-.tab-btn.active {
-    color: var(--accent-blue);
-    border-bottom-color: var(--accent-blue);
-}
-
-.tab-pane {
-    display: none;
-}
-
-.tab-pane.active {
-    display: block;
-}
-
-/* Map Container */
-#mapContainer {
-    height: 520px;
-    width: 100%;
-    border-radius: 8px;
-    margin-top: 14px;
-    z-index: 1;
-}
-
-/* Prediction Form */
-.pred-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
-    margin-top: 16px;
-}
-
-.full-width {
-    grid-column: 1 / -1;
-}
-
-.slider {
-    width: 100%;
-    accent-color: var(--accent-blue);
-}
-
-.result-box {
-    margin-top: 24px;
-    background: #0d1322;
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 20px;
-}
-
-.hidden {
-    display: none;
-}
-
-.result-body {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    align-items: center;
-    margin-top: 14px;
-}
-
-.status-card {
-    padding: 20px;
-    border-radius: 10px;
-    text-align: center;
-}
-
-.status-card.tinggi {
-    background: rgba(239, 68, 68, 0.15);
-    border: 2px solid var(--red);
-    color: var(--red);
-}
-
-.status-card.sedang {
-    background: rgba(245, 158, 11, 0.15);
-    border: 2px solid var(--yellow);
-    color: var(--yellow);
-}
-
-.status-card.rendah {
-    background: rgba(16, 185, 129, 0.15);
-    border: 2px solid var(--green);
-    color: var(--green);
-}
-
-.prob-container {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.prob-row {
-    display: grid;
-    grid-template-columns: 120px 1fr 50px;
-    align-items: center;
-    gap: 10px;
-    font-size: 13px;
-}
-
-.progress-bar {
-    background: #1e293b;
-    border-radius: 999px;
-    height: 10px;
-    overflow: hidden;
-}
-
-.progress-fill {
-    height: 100%;
-    width: 0%;
-    transition: width 0.4s ease-in-out;
-}
-
-.progress-fill.red { background-color: var(--red); }
-.progress-fill.yellow { background-color: var(--yellow); }
-.progress-fill.green { background-color: var(--green); }
-
-/* Analytics Charts Grid */
-.analytics-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-}
-
-.chart-card canvas {
-    max-height: 320px;
-    margin-top: 14px;
-}
-
-/* Data Table */
-.table-actions {
-    display: flex;
-    justify-content: space-between;
-    gap: 16px;
-    margin-bottom: 16px;
-}
-
-.table-responsive {
-    overflow-x: auto;
-}
-
-.data-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-}
-
-.data-table th, .data-table td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.data-table th {
-    background: #0f172a;
-    color: var(--text-muted);
-    font-weight: 600;
-}
-
-.data-table tbody tr:hover {
-    background: var(--bg-card-hover);
-}
-
-.pagination-controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 16px;
+  background-color: var(--cream-bg) !important;
+  color: var(--text-dark) !important;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+:focus-visible {
+  outline: 2px solid var(--forest-main);
+  outline-offset: 2px;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ==========================================================================
+   1. HERO SECTION WITH FLOATING CREAM PILL NAVBAR
+   ========================================================================== */
+.hero-banner {
+  position: relative;
+  background:
+    radial-gradient(circle at 75% 25%, rgba(88, 122, 62, 0.38) 0%, transparent 55%),
+    radial-gradient(circle at 20% 80%, rgba(52, 71, 38, 0.65) 0%, transparent 60%),
+    linear-gradient(165deg, #162210 0%, #24351A 45%, #344726 75%, #1B2813 100%);
+  color: var(--text-light);
+  padding: 28px 24px 56px;
+  overflow: hidden;
+}
+
+/* Subtle organic topographic contour pattern overlay */
+.hero-banner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(ellipse 600px 260px at 70% 35%, rgba(250, 248, 242, 0.06) 0%, rgba(250, 248, 242, 0.06) 48%, transparent 50%),
+    radial-gradient(ellipse 480px 220px at 25% 65%, rgba(250, 248, 242, 0.04) 0%, rgba(250, 248, 242, 0.04) 48%, transparent 50%);
+  pointer-events: none;
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 2;
+  max-width: 1240px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Floating Cream Pill Navigation Bar */
+.floating-pill-nav {
+  background-color: var(--cream-bg);
+  color: var(--text-dark);
+  border-radius: var(--radius-pill);
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex-wrap: wrap;
+  width: 100%;
+  max-width: 880px;
+  box-shadow: 0 12px 32px rgba(14, 22, 9, 0.28);
+}
+
+.pill-nav-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-dark);
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  font-weight: 500;
+  padding: 9px 20px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+
+.pill-nav-btn:hover {
+  background-color: rgba(52, 71, 38, 0.1);
+}
+
+.pill-nav-btn.active {
+  background-color: var(--forest-main) !important;
+  color: var(--cream-bg) !important;
+  font-weight: 600;
+}
+
+/* Centered Hero Brand Lockup */
+.hero-lockup {
+  text-align: center;
+  margin: 54px 0 38px;
+  max-width: 780px;
+}
+
+.hero-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+
+.hero-flank {
+  font-family: var(--font-serif);
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(250, 248, 242, 0.75);
+}
+
+.hero-display-title {
+  font-family: var(--font-serif);
+  font-size: clamp(38px, 6vw, 68px);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  line-height: 1.02;
+  color: var(--cream-bg);
+  text-transform: uppercase;
+}
+
+.hero-display-title .swash {
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.hero-subtitle {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 400;
+  color: rgba(250, 248, 242, 0.85);
+  margin-top: 10px;
+  letter-spacing: 0.02em;
+}
+
+.hero-cta-wrap {
+  margin-top: 24px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn-cream-pill {
+  background-color: var(--cream-bg);
+  color: var(--text-dark);
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 11px 28px;
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-cream-pill:hover {
+  background-color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.hero-micro-caption {
+  font-family: var(--font-serif);
+  font-size: 11.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(250, 248, 242, 0.72);
+  text-align: center;
+}
+
+/* ==========================================================================
+   2. EDITORIAL SECTION HEADINGS (ON CREAM & ON FOREST)
+   ========================================================================== */
+.editorial-section {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 56px 24px;
+}
+
+.editorial-header-center {
+  text-align: center;
+  max-width: 560px;
+  margin: 0 auto 40px;
+}
+
+.editorial-heading {
+  font-family: var(--font-serif);
+  font-size: clamp(30px, 4vw, 44px);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.12;
+  color: var(--text-dark);
+}
+
+.editorial-sub {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-olive);
+  margin-top: 10px;
+}
+
+/* ==========================================================================
+   3. KPI PORTRAIT CARDS ("О НАС" CARD STYLE WITH BOTTOM-RIGHT ARROW CIRCLE)
+   ========================================================================== */
+.kpi-editorial-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 22px;
 }
 
 @media (max-width: 1024px) {
-    .layout-body { flex-direction: column; }
-    .sidebar { width: 100%; }
-    .summary-cards { grid-template-columns: repeat(2, 1fr); }
-    .pred-grid, .analytics-grid, .result-body { grid-template-columns: 1fr; }
+  .kpi-editorial-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .kpi-editorial-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.kpi-portrait-card {
+  position: relative;
+  border-radius: var(--radius-card);
+  padding: 26px 24px 22px;
+  min-height: 230px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: var(--cream-bg);
+  overflow: hidden;
+  transition: transform 0.25s ease;
+}
+
+.kpi-portrait-card:hover {
+  transform: translateY(-4px);
+}
+
+/* Tonal Botanical Card Backgrounds matching the reference photo cards */
+.kpi-portrait-card.card-total {
+  background:
+    radial-gradient(circle at 80% 20%, rgba(122, 154, 95, 0.35) 0%, transparent 55%),
+    linear-gradient(160deg, #2B3D1E 0%, #1B2712 100%);
+}
+
+.kpi-portrait-card.card-high {
+  background:
+    radial-gradient(circle at 85% 20%, rgba(201, 74, 56, 0.38) 0%, transparent 55%),
+    linear-gradient(160deg, #4A241E 0%, #26120F 100%);
+}
+
+.kpi-portrait-card.card-med {
+  background:
+    radial-gradient(circle at 85% 20%, rgba(212, 136, 42, 0.35) 0%, transparent 55%),
+    linear-gradient(160deg, #473619 0%, #241B0B 100%);
+}
+
+.kpi-portrait-card.card-low {
+  background:
+    radial-gradient(circle at 85% 20%, rgba(92, 133, 64, 0.4) 0%, transparent 55%),
+    linear-gradient(160deg, #344726 0%, #1D2915 100%);
+}
+
+.kpi-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.kpi-tag {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(250, 248, 242, 0.78);
+}
+
+.kpi-pct-pill {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  background: rgba(250, 248, 242, 0.16);
+  color: var(--cream-bg);
+  backdrop-filter: blur(4px);
+}
+
+.kpi-number {
+  font-family: var(--font-serif);
+  font-size: 52px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--cream-bg);
+  margin: 18px 0 12px;
+  letter-spacing: -0.01em;
+}
+
+.kpi-card-bottom {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.kpi-caption {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--cream-bg);
+}
+
+.kpi-subcaption {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 400;
+  color: rgba(250, 248, 242, 0.68);
+  margin-top: 2px;
+}
+
+/* Signature small solid cream circle arrow button from the reference */
+.circle-arrow-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: var(--cream-bg);
+  color: var(--forest-dark);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.kpi-portrait-card:hover .circle-arrow-badge {
+  transform: translateX(2px);
+}
+
+/* ==========================================================================
+   4. ROUNDED TOP DARK FOREST GREEN SHEET ("В ЧЕМ НАША ОСОБЕННОСТЬ?" BLOCK)
+   ========================================================================== */
+.forest-sheet-section {
+  background-color: var(--forest-main);
+  color: var(--cream-bg);
+  border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
+  padding: 64px 24px 56px;
+  margin-top: 12px;
+}
+
+.forest-sheet-inner {
+  max-width: 1160px;
+  margin: 0 auto;
+}
+
+.forest-sheet-section .editorial-heading {
+  color: var(--cream-bg);
+  text-align: center;
+  max-width: 620px;
+  margin: 0 auto 44px;
+}
+
+/* 4-Column Minimalist White Line-Icon Grid (No Borders, Clean Air) */
+.feature-icon-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 36px 24px;
+  margin-bottom: 48px;
+}
+
+@media (max-width: 900px) {
+  .feature-icon-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.feature-icon-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+}
+
+.feature-icon-svg {
+  width: 42px;
+  height: 42px;
+  color: var(--cream-bg);
+  stroke-width: 1.4;
+}
+
+.feature-icon-label {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.38;
+  color: var(--cream-bg);
+  max-width: 190px;
+}
+
+.feature-icon-sub {
+  font-size: 11.5px;
+  color: var(--text-cream-muted);
+  max-width: 200px;
+  line-height: 1.4;
+}
+
+/* Integrated Geospatial Filter Bar inside the Forest Sheet */
+.forest-filter-bar {
+  background-color: rgba(22, 32, 15, 0.42);
+  border: 1px solid rgba(250, 248, 242, 0.16);
+  border-radius: var(--radius-lg);
+  padding: 22px 26px;
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 18px;
+  align-items: end;
+}
+
+@media (max-width: 820px) {
+  .forest-filter-bar {
+    grid-template-columns: 1fr;
+  }
+}
+
+.filter-field label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-cream-muted);
+  margin-bottom: 7px;
+}
+
+.editorial-select {
+  width: 100%;
+  background-color: var(--cream-bg);
+  color: var(--text-dark);
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  padding: 11px 18px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+  transition: box-shadow 0.2s ease;
+}
+
+.editorial-select:focus {
+  box-shadow: 0 0 0 3px rgba(250, 248, 242, 0.35);
+}
+
+/* Signature Pill Button with Circle Arrow on Right */
+.btn-pill-with-arrow {
+  background-color: var(--cream-bg);
+  color: var(--text-dark);
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 7px 8px 7px 22px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-pill-with-arrow:hover {
+  transform: translateY(-1px);
+  background-color: #ffffff;
+}
+
+.btn-pill-with-arrow .arrow-circle {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: var(--forest-main);
+  color: var(--cream-bg);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Dark Forest Pill Button for Light Cream Sections */
+.btn-forest-pill {
+  background-color: var(--forest-main);
+  color: var(--cream-bg);
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 8px 9px 8px 24px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.btn-forest-pill:hover {
+  background-color: var(--forest-dark);
+  transform: translateY(-1px);
+}
+
+.btn-forest-pill .arrow-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: var(--cream-bg);
+  color: var(--forest-dark);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   5. MAIN CONTENT TABS & EDITORIAL SPLIT SECTIONS (ON WARM CREAM)
+   ========================================================================== */
+.workspace-section {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 52px 24px 72px;
+}
+
+.section- switcher-bar {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 36px;
+}
+
+.tab-nav-editorial {
+  background-color: var(--cream-card);
+  border: 1px solid var(--cream-border);
+  border-radius: var(--radius-pill);
+  padding: 5px;
+  display: inline-flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-olive);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 10px 22px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.tab-btn:hover {
+  color: var(--text-dark);
+}
+
+.tab-btn.active {
+  background-color: var(--forest-main) !important;
+  color: var(--cream-bg) !important;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(52, 71, 38, 0.22);
+}
+
+.tab-pane {
+  display: none;
+}
+
+.tab-pane.active {
+  display: block;
+  animation: editorialFade 0.25s ease-out;
+}
+
+@keyframes editorialFade {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Editorial Split Layout for Map ("ГОЛЬФ-ПОЛЕ" Reference Layout) */
+.editorial-split-map {
+  display: grid;
+  grid-template-columns: 1.55fr 1fr;
+  gap: 36px;
+  align-items: center;
+}
+
+@media (max-width: 992px) {
+  .editorial-split-map {
+    grid-template-columns: 1fr;
+  }
+}
+
+.map-frame-card {
+  background-color: var(--cream-card);
+  border-radius: var(--radius-lg);
+  padding: 10px;
+  border: 1px solid var(--cream-border);
+}
+
+#mapContainer {
+  height: 540px;
+  width: 100%;
+  border-radius: 18px;
+  overflow: hidden;
+  z-index: 10;
+}
+
+.editorial-side-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.editorial-side-copy .editorial-heading {
+  text-align: left;
+}
+
+.editorial-side-copy p {
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: var(--text-olive);
+}
+
+.legend-editorial-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  margin: 6px 0;
+  padding: 18px;
+  background-color: var(--cream-surface);
+  border-radius: 16px;
+  border: 1px solid var(--cream-border);
+}
+
+.legend-editorial-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 12.5px;
+  color: var(--text-olive);
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+.legend-dot.high { background-color: var(--risk-high); }
+.legend-dot.med { background-color: var(--risk-med); }
+.legend-dot.low { background-color: var(--risk-low); }
+
+/* Leaflet Popup in Warm Cream / Forest Editorial Style */
+.leaflet-popup-content-wrapper {
+  background: var(--cream-bg) !important;
+  color: var(--text-dark) !important;
+  border: 1px solid var(--cream-border) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 14px 28px rgba(33, 46, 24, 0.18) !important;
+  padding: 4px !important;
+}
+
+.leaflet-popup-tip {
+  background: var(--cream-bg) !important;
+}
+
+.leaflet-tooltip {
+  background: var(--forest-main) !important;
+  color: var(--cream-bg) !important;
+  border: none !important;
+  font-family: var(--font-sans) !important;
+  font-weight: 600 !important;
+  border-radius: 9999px !important;
+  padding: 4px 12px !important;
+}
+
+/* ==========================================================================
+   6. SIMULATION & PREDICTION CARD
+   ========================================================================== */
+.editorial-card {
+  background-color: var(--cream-surface);
+  border: 1px solid var(--cream-border);
+  border-radius: var(--radius-lg);
+  padding: 36px;
+}
+
+@media (max-width: 640px) {
+  .editorial-card {
+    padding: 22px;
+  }
+}
+
+.preset-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 14px 18px;
+  background-color: var(--cream-bg);
+  border: 1px solid var(--cream-border);
+  border-radius: var(--radius-pill);
+  margin-bottom: 28px;
+}
+
+@media (max-width: 768px) {
+  .preset-bar {
+    border-radius: 16px;
+  }
+}
+
+.preset-label {
+  font-family: var(--font-serif);
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--forest-main);
+  margin-right: 4px;
+}
+
+.btn-preset {
+  background-color: var(--cream-card);
+  color: var(--text-dark);
+  border: 1px solid var(--cream-border);
+  border-radius: var(--radius-pill);
+  padding: 7px 16px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-preset:hover {
+  background-color: var(--forest-main);
+  color: var(--cream-bg);
+  border-color: var(--forest-main);
+}
+
+.pred-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 860px) {
+  .pred-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.slider-box {
+  background-color: var(--cream-bg);
+  border: 1px solid var(--cream-border);
+  border-radius: 16px;
+  padding: 16px 20px;
+}
+
+.slider-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.slider-header label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-olive);
+  margin: 0;
+}
+
+.slider-val-pill {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--forest-main);
+  background-color: var(--cream-surface);
+  padding: 2px 12px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--cream-border);
+}
+
+.custom-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 5px;
+  border-radius: var(--radius-pill);
+  background: var(--cream-border);
+  outline: none;
+}
+
+.custom-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--forest-main);
+  cursor: pointer;
+  border: 2px solid var(--cream-bg);
+  box-shadow: 0 2px 6px rgba(33, 46, 24, 0.3);
+  transition: transform 0.15s ease;
+}
+
+.custom-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+.custom-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--forest-main);
+  cursor: pointer;
+  border: 2px solid var(--cream-bg);
+}
+
+/* Result Box */
+.result-box {
+  margin-top: 28px;
+  background-color: var(--cream-bg);
+  border: 1px solid var(--cream-border);
+  border-radius: var(--radius-card);
+  padding: 28px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.status-card {
+  padding: 22px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.status-card h2 {
+  font-family: var(--font-serif);
+  font-size: 26px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.status-card p {
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.status-card.tinggi {
+  background: var(--risk-high-bg);
+  border: 1px solid var(--risk-high-border);
+  color: #6E1E14;
+}
+.status-card.tinggi h2 { color: var(--risk-high); }
+
+.status-card.sedang {
+  background: var(--risk-med-bg);
+  border: 1px solid var(--risk-med-border);
+  color: #6B4009;
+}
+.status-card.sedang h2 { color: var(--risk-med); }
+
+.status-card.rendah {
+  background: var(--risk-low-bg);
+  border: 1px solid var(--risk-low-border);
+  color: var(--forest-dark);
+}
+.status-card.rendah h2 { color: var(--forest-main); }
+
+.progress-bar {
+  background: var(--cream-card);
+  border-radius: var(--radius-pill);
+  height: 8px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: var(--radius-pill);
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.progress-fill.red { background: var(--risk-high); }
+.progress-fill.yellow { background: var(--risk-med); }
+.progress-fill.green { background: var(--forest-main); }
+
+/* Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 11px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.badge-red {
+  background: var(--risk-high-bg);
+  color: var(--risk-high);
+  border: 1px solid var(--risk-high-border);
+}
+
+.badge-yellow {
+  background: var(--risk-med-bg);
+  color: var(--risk-med);
+  border: 1px solid var(--risk-med-border);
+}
+
+.badge-green {
+  background: var(--risk-low-bg);
+  color: var(--forest-main);
+  border: 1px solid var(--risk-low-border);
+}
+
+/* ==========================================================================
+   7. DATA TABLE & FOOTER
+   ========================================================================== */
+.editorial-table-wrap {
+  overflow-x: auto;
+  border-radius: 16px;
+  border: 1px solid var(--cream-border);
+  background-color: var(--cream-bg);
+}
+
+.editorial-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13px;
+}
+
+.editorial-table th {
+  background-color: var(--forest-main);
+  color: var(--cream-bg);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 14px 16px;
+  white-space: nowrap;
+}
+
+.editorial-table td {
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--cream-border);
+  color: var(--text-dark);
+  white-space: nowrap;
+}
+
+.editorial-table tbody tr:hover td {
+  background-color: var(--cream-surface);
+}
+
+/* Editorial Footer Banner ("ПРИСОЕДИНЯЙСЯ К НАМ!" Reference Footer) */
+.editorial-footer {
+  background:
+    radial-gradient(circle at 30% 30%, rgba(88, 122, 62, 0.3) 0%, transparent 60%),
+    linear-gradient(165deg, #1A2612 0%, #2C3D20 55%, #16200F 100%);
+  color: var(--cream-bg);
+  padding: 64px 24px 36px;
+  text-align: center;
+}
+
+.editorial-footer-inner {
+  max-width: 1160px;
+  margin: 0 auto;
+}
+
+.editorial-footer-heading {
+  font-family: var(--font-serif);
+  font-size: clamp(28px, 4vw, 46px);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--cream-bg);
+  margin-bottom: 36px;
+}
+
+.editorial-footer-divider {
+  border: 0;
+  border-top: 1px solid rgba(250, 248, 242, 0.28);
+  margin-bottom: 24px;
+}
+
+.editorial-footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 12px;
+  color: rgba(250, 248, 242, 0.78);
+}
+
+.footer-brand {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--cream-bg);
 }

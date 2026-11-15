@@ -1,9 +1,55 @@
-// MAIN CLIENT APPLICATION JAVASCRIPT
-// Editorial Botanical Theme ("Regal Crest" Reference Style)
-// Handles Leaflet Map, Charts, Prediction Form & API interactions
-
 document.addEventListener("DOMContentLoaded", () => {
-  // 1. TAB SWITCHING (Syncs Floating Pill Nav & Workspace Tab Bar)
+  let currentDataset = "dataset_cuaca_sulawesi_tengah.csv";
+  let currentPage = 1;
+  let map = null;
+  let geoJsonLayer = null;
+  let markerCluster = null;
+  let chartKab = null;
+  let chartWeather = null;
+  let chartFI = null;
+  let kabupatenElevations = {};
+
+  const FEATURE_LABELS = {
+    curah_hujan: "Curah Hujan Harian (mm)",
+    presipitasi: "Presipitasi Total (mm)",
+    durasi_hujan: "Durasi Hujan (Jam)",
+    hujan_3hari: "Akumulasi Hujan 3 Hari (mm)",
+    hujan_7hari: "Akumulasi Hujan 7 Hari (mm)",
+    kelembapan: "Kelembapan Udara (%)",
+    tutupan_awan: "Tutupan Awan (%)",
+    kode_cuaca: "Kode Kondisi Cuaca",
+    suhu: "Suhu Udara (°C)",
+    kecepatan_angin: "Kecepatan Angin Rata-rata (km/h)",
+    angin_maks: "Kecepatan Angin Maksimum (km/h)",
+    elevasi: "Elevasi Grid (mdpl)",
+    latitude: "Garis Lintang (Lat)",
+    longitude: "Garis Bujur (Lon)",
+    bulan: "Bulan Kalender",
+    jam: "Jam Pemantauan",
+  };
+
+  function getSelectedDataset() {
+    const sel = document.getElementById("filterDataset");
+    return sel ? sel.value : currentDataset;
+  }
+
+  function syncDatasetSelectors(newDataset) {
+    currentDataset = newDataset;
+    const filterSel = document.getElementById("filterDataset");
+    const topSel = document.getElementById("topDatasetSelect");
+    if (filterSel && filterSel.value !== newDataset) {
+      filterSel.value = newDataset;
+    }
+    if (topSel && topSel.value !== newDataset) {
+      topSel.value = newDataset;
+    }
+    const exportBtn = document.getElementById("btnExportCsv");
+    if (exportBtn) {
+      exportBtn.href = `/api/export-csv?dataset=${encodeURIComponent(newDataset)}`;
+    }
+  }
+
+  // Sync top pill navbar and workspace tab bar
   const tabButtons = document.querySelectorAll(".tab-btn");
   const tabPanes = document.querySelectorAll(".tab-pane");
 
@@ -38,10 +84,27 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // 2. FETCH SUMMARY METRICS
-  async function loadSummary(kabupaten = "all", risk = "all") {
+  function updateElevasiFromKabupaten(kabName) {
+    const elevInput = document.getElementById("pElevasi");
+    const elevLbl = document.getElementById("valElevasiLbl");
+    if (!elevInput || !kabName) return;
+    if (Object.prototype.hasOwnProperty.call(kabupatenElevations, kabName)) {
+      const elevVal = Math.round(Number(kabupatenElevations[kabName]) || 45);
+      elevInput.value = elevVal;
+      if (elevLbl) elevLbl.textContent = elevVal;
+    }
+  }
+
+  async function loadSummary(
+    kabupaten = "all",
+    risk = "all",
+    forceKabRefresh = false,
+  ) {
+    const ds = getSelectedDataset();
     try {
-      const res = await fetch(`/api/summary?kabupaten=${kabupaten}&risk=${risk}`);
+      const res = await fetch(
+        `/api/summary?dataset=${encodeURIComponent(ds)}&kabupaten=${encodeURIComponent(kabupaten)}&risk=${encodeURIComponent(risk)}`,
+      );
       const data = await res.json();
 
       const total = data.total_data ?? data.total_records ?? 0;
@@ -51,6 +114,13 @@ document.addEventListener("DOMContentLoaded", () => {
       const highPct = data.high_pct ?? 0;
       const medPct = data.med_pct ?? 0;
       const lowPct = data.low_pct ?? 0;
+      const meta = data.dataset_meta || {};
+      const dsType = meta.type || "csv";
+      const isXlsx = dsType === "xlsx_banjir" || dsType === "xlsx_historis";
+
+      if (data.kabupaten_elevations) {
+        kabupatenElevations = data.kabupaten_elevations;
+      }
 
       const elTotal = document.getElementById("valTotalData");
       if (elTotal) elTotal.textContent = Number(total).toLocaleString();
@@ -73,12 +143,99 @@ document.addEventListener("DOMContentLoaded", () => {
       const elLowPct = document.getElementById("pctLowRisk");
       if (elLowPct) elLowPct.textContent = `${lowPct}%`;
 
-      // Populate Kabupaten select dropdowns once
+      const descEl = document.getElementById("summaryDatasetDesc");
+      if (descEl && meta.description) {
+        descEl.textContent = meta.description;
+      }
+
+      const activeBadge = document.getElementById("activeDatasetBadge");
+      if (activeBadge && meta.source) {
+        activeBadge.textContent = `${meta.source} • Akurasi RF: ${meta.accuracy ?? 95}%`;
+      }
+
+      const predBadge = document.getElementById("predictModelBadge");
+      if (predBadge) {
+        predBadge.textContent = `Model Aktif: ${meta.short_label || data.dataset_key || ds} (Akurasi: ${meta.accuracy ?? 95}%)`;
+      }
+
+      const kpiCaption = document.getElementById("kpiTotalCaption");
+      const kpiSubcaption = document.getElementById("kpiTotalSubcaption");
+      if (dsType === "xlsx_banjir") {
+        if (kpiCaption) kpiCaption.textContent = "Kejadian Banjir Historis";
+        if (kpiSubcaption)
+          kpiSubcaption.textContent = "Sheet 1: Banjir_dan_Cuaca (37 Kolom)";
+      } else if (dsType === "xlsx_historis") {
+        if (kpiCaption) kpiCaption.textContent = "Rekaman Harian ECMWF IFS";
+        if (kpiSubcaption)
+          kpiSubcaption.textContent = "Sheet 2: Cuaca_Historis (2019-2026)";
+      } else {
+        if (kpiCaption) kpiCaption.textContent = "Titik Pantau Cuaca";
+        if (kpiSubcaption)
+          kpiSubcaption.textContent = "Cakupan Desa Sulawesi Tengah";
+      }
+
+      const impactBanner = document.getElementById("xlsxImpactBanner");
+      if (impactBanner) {
+        if (isXlsx) {
+          impactBanner.classList.remove("hidden");
+          const sheetTag = document.getElementById("xlsxSheetTag");
+          if (sheetTag) {
+            sheetTag.textContent =
+              dsType === "xlsx_banjir"
+                ? "Sheet 1: Banjir_dan_Cuaca (37 Kolom)"
+                : "Sheet 2: Cuaca_Historis (18 Kolom)";
+          }
+          const elTerendam = document.getElementById("valRumahTerendam");
+          if (elTerendam) {
+            elTerendam.textContent = Number(
+              data.total_rumah_terendam ?? 0,
+            ).toLocaleString();
+          }
+          const elRusak = document.getElementById("valRumahRusak");
+          if (elRusak) {
+            elRusak.textContent = Number(
+              data.total_rumah_rusak ?? 0,
+            ).toLocaleString();
+          }
+          const elFasum = document.getElementById("valFasumRusak");
+          if (elFasum) {
+            elFasum.textContent = Number(
+              data.total_fasum_rusak ?? 0,
+            ).toLocaleString();
+          }
+          const elAvgHujan = document.getElementById("valAvgHujan");
+          if (elAvgHujan) {
+            elAvgHujan.textContent = `${data.avg_curah_hujan ?? 0} mm (${data.avg_hujan_3hari ?? 0} mm / 3H)`;
+          }
+        } else {
+          impactBanner.classList.add("hidden");
+        }
+      }
+
+      const xlsxSimFields = document.getElementById("xlsxSimFields");
+      if (xlsxSimFields) {
+        if (isXlsx) {
+          xlsxSimFields.classList.remove("hidden");
+        } else {
+          xlsxSimFields.classList.add("hidden");
+        }
+      }
+
       const selectKab = document.getElementById("filterKabupaten");
       const selectPKab = document.getElementById("pKabupaten");
       const kabList = data.kabupaten_list ?? data.kabupaten_options ?? [];
 
-      if (selectKab && selectKab.options.length <= 1 && Array.isArray(kabList)) {
+      if (
+        selectKab &&
+        (forceKabRefresh || selectKab.options.length <= 1) &&
+        Array.isArray(kabList)
+      ) {
+        const prevKab = selectKab.value;
+        selectKab.innerHTML = `<option value="all">Semua Kabupaten/Kota (${kabList.length} Wilayah)</option>`;
+        if (selectPKab) {
+          selectPKab.innerHTML = "";
+        }
+
         kabList.forEach((kab) => {
           const opt1 = document.createElement("option");
           opt1.value = kab;
@@ -92,16 +249,25 @@ document.addEventListener("DOMContentLoaded", () => {
             selectPKab.appendChild(opt2);
           }
         });
+
+        if (prevKab !== "all" && kabList.includes(prevKab)) {
+          selectKab.value = prevKab;
+        }
+        if (selectPKab && selectPKab.value) {
+          updateElevasiFromKabupaten(selectPKab.value);
+        }
       }
     } catch (err) {
       console.error("Error loading summary stats:", err);
     }
   }
 
-  // 3. LEAFLET MAP & GEOPANDAS BOUNDARY (Botanical / Terrain Aesthetic)
-  let map = null;
-  let geoJsonLayer = null;
-  let markerCluster = null;
+  const pKabSelect = document.getElementById("pKabupaten");
+  if (pKabSelect) {
+    pKabSelect.addEventListener("change", (e) => {
+      updateElevasiFromKabupaten(e.target.value);
+    });
+  }
 
   function initMap() {
     const mapContainer = document.getElementById("mapContainer");
@@ -144,10 +310,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function loadMapData(kabupaten = "all", risk = "all") {
     if (!map) return;
+    const ds = getSelectedDataset();
 
     if (!geoJsonLayer) {
       try {
-        const resB = await fetch("/api/geojson/boundary");
+        const resB = await fetch(
+          `/api/geojson/boundary?dataset=${encodeURIComponent(ds)}`,
+        );
         const geoJsonData = await resB.json();
 
         geoJsonLayer = L.geoJSON(geoJsonData, {
@@ -173,7 +342,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       const resP = await fetch(
-        `/api/weather-points?kabupaten=${kabupaten}&risk=${risk}&limit=2000`,
+        `/api/weather-points?dataset=${encodeURIComponent(ds)}&kabupaten=${encodeURIComponent(kabupaten)}&risk=${encodeURIComponent(risk)}&limit=2000`,
       );
       const dataP = await resP.json();
 
@@ -184,6 +353,9 @@ document.addEventListener("DOMContentLoaded", () => {
         Sedang: "#C47A1B",
         Rendah: "#344726",
       };
+
+      const dsType = dataP.dataset_type || "csv";
+      const isXlsx = dsType === "xlsx_banjir" || dsType === "xlsx_historis";
 
       dataP.points.forEach((pt) => {
         const color = colorMap[pt.kategori_risiko] || "#344726";
@@ -196,19 +368,42 @@ document.addEventListener("DOMContentLoaded", () => {
           weight: 1.5,
         });
 
+        const extraRowsHtml = isXlsx
+          ? `
+            <div><span style="color: #5A6451;">Curah Hujan:</span> <b>${pt.curah_hujan} mm</b></div>
+            <div><span style="color: #5A6451;">Presipitasi:</span> <b>${pt.presipitasi} mm</b></div>
+            <div><span style="color: #5A6451;">Durasi:</span> <b>${pt.durasi_hujan} jam</b></div>
+            <div><span style="color: #5A6451;">Hujan 3H/7H:</span> <b>${pt.hujan_3hari}/${pt.hujan_7hari} mm</b></div>
+            <div><span style="color: #5A6451;">Angin Maks:</span> <b>${pt.angin_maks} km/h</b></div>
+            <div><span style="color: #5A6451;">Elevasi:</span> <b>${pt.elevasi} mdpl</b></div>
+            <div><span style="color: #5A6451;">Terendam:</span> <b>${Number(pt.rumah_terendam || 0).toLocaleString()} unit</b></div>
+            <div><span style="color: #5A6451;">Tanggal:</span> <b>${pt.tanggal}</b></div>
+          `
+          : `
+            <div><span style="color: #5A6451;">Awan:</span> <b>${pt.tutupan_awan}%</b></div>
+            <div><span style="color: #5A6451;">Angin:</span> <b>${pt.kecepatan_angin} km/h</b></div>
+          `;
+
+        const penyebabLine =
+          isXlsx && pt.penyebab && pt.penyebab !== "-"
+            ? `<div style="font-size: 11px; color: #5A6451; margin-bottom: 8px;"><b>Penyebab:</b> ${pt.penyebab}</div>`
+            : "";
+
         const popupHtml = `
-          <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; color: #212E18; min-width: 220px; line-height: 1.5;">
+          <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; color: #212E18; min-width: 255px; line-height: 1.5;">
             <div style="font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; color: #212E18; margin-bottom: 2px;">
               ${pt.kecamatan}
             </div>
-            <div style="font-size: 11.5px; color: #5A6451; margin-bottom: 10px;">
-              Desa ${pt.desa} • ${pt.kabupaten}
+            <div style="font-size: 11.5px; color: #5A6451; margin-bottom: 6px;">
+              ${pt.desa} • ${pt.kabupaten}
             </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 12px; background: #F3EFE4; padding: 9px 11px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #DED9C8;">
+            ${penyebabLine}
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 11.5px; background: #F3EFE4; padding: 9px 11px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #DED9C8;">
               <div><span style="color: #5A6451;">Suhu:</span> <b>${pt.suhu} °C</b></div>
               <div><span style="color: #5A6451;">Lembap:</span> <b>${pt.kelembapan}%</b></div>
-              <div><span style="color: #5A6451;">Awan:</span> <b>${pt.tutupan_awan}%</b></div>
               <div><span style="color: #5A6451;">Cuaca:</span> <b>${pt.cuaca}</b></div>
+              <div><span style="color: #5A6451;">Skor:</span> <b>${pt.risk_score}</b></div>
+              ${extraRowsHtml}
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #DED9C8; padding-top: 8px;">
               <span style="font-size: 11px; color: #5A6451;">Status Risiko:</span>
@@ -220,7 +415,7 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
 
         marker.bindPopup(popupHtml);
-        marker.bindTooltip(`${pt.kecamatan}: ${pt.kategori_risiko}`);
+        marker.bindTooltip(`${pt.kabupaten} (${pt.desa}): ${pt.kategori_risiko}`);
         markerCluster.addLayer(marker);
       });
 
@@ -236,14 +431,20 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // 4. SLIDER BINDINGS & PREDICTION FORM
   const sliders = [
     { id: "pSuhu", lbl: "valSuhuLbl" },
     { id: "pKelembapan", lbl: "valKelembapanLbl" },
     { id: "pAwan", lbl: "valAwanLbl" },
     { id: "pAngin", lbl: "valAnginLbl" },
+    { id: "pCurahHujan", lbl: "valCurahHujanLbl" },
     { id: "pJam", lbl: "valJamLbl" },
     { id: "pBulan", lbl: "valBulanLbl" },
+    { id: "pDurasiHujan", lbl: "valDurasiHujanLbl" },
+    { id: "pPresipitasi", lbl: "valPresipitasiLbl" },
+    { id: "pHujan3H", lbl: "valHujan3HLbl" },
+    { id: "pHujan7H", lbl: "valHujan7HLbl" },
+    { id: "pAnginMaks", lbl: "valAnginMaksLbl" },
+    { id: "pElevasi", lbl: "valElevasiLbl" },
   ];
 
   sliders.forEach((item) => {
@@ -264,23 +465,59 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!preset) return;
 
       if (preset === "ekstrem") {
-        document.getElementById("pSuhu").value = 23;
-        document.getElementById("pKelembapan").value = 96;
-        document.getElementById("pAwan").value = 95;
-        document.getElementById("pAngin").value = 35;
-        document.getElementById("pKodeCuaca").value = 95;
+        document.getElementById("pSuhu").value = 24;
+        document.getElementById("pKelembapan").value = 95;
+        document.getElementById("pAwan").value = 96;
+        document.getElementById("pAngin").value = 28;
+        document.getElementById("pKodeCuaca").value = 65;
+        if (document.getElementById("pCurahHujan"))
+          document.getElementById("pCurahHujan").value = 68;
+        if (document.getElementById("pDurasiHujan"))
+          document.getElementById("pDurasiHujan").value = 20;
+        if (document.getElementById("pPresipitasi"))
+          document.getElementById("pPresipitasi").value = 72;
+        if (document.getElementById("pHujan3H"))
+          document.getElementById("pHujan3H").value = 115;
+        if (document.getElementById("pHujan7H"))
+          document.getElementById("pHujan7H").value = 195;
+        if (document.getElementById("pAnginMaks"))
+          document.getElementById("pAnginMaks").value = 38;
       } else if (preset === "sedang") {
         document.getElementById("pSuhu").value = 26;
-        document.getElementById("pKelembapan").value = 82;
-        document.getElementById("pAwan").value = 75;
-        document.getElementById("pAngin").value = 16;
+        document.getElementById("pKelembapan").value = 84;
+        document.getElementById("pAwan").value = 80;
+        document.getElementById("pAngin").value = 15;
         document.getElementById("pKodeCuaca").value = 61;
+        if (document.getElementById("pCurahHujan"))
+          document.getElementById("pCurahHujan").value = 18;
+        if (document.getElementById("pDurasiHujan"))
+          document.getElementById("pDurasiHujan").value = 11;
+        if (document.getElementById("pPresipitasi"))
+          document.getElementById("pPresipitasi").value = 19;
+        if (document.getElementById("pHujan3H"))
+          document.getElementById("pHujan3H").value = 42;
+        if (document.getElementById("pHujan7H"))
+          document.getElementById("pHujan7H").value = 88;
+        if (document.getElementById("pAnginMaks"))
+          document.getElementById("pAnginMaks").value = 21;
       } else if (preset === "aman") {
-        document.getElementById("pSuhu").value = 32;
-        document.getElementById("pKelembapan").value = 60;
-        document.getElementById("pAwan").value = 20;
-        document.getElementById("pAngin").value = 10;
-        document.getElementById("pKodeCuaca").value = 0;
+        document.getElementById("pSuhu").value = 31;
+        document.getElementById("pKelembapan").value = 62;
+        document.getElementById("pAwan").value = 25;
+        document.getElementById("pAngin").value = 8;
+        document.getElementById("pKodeCuaca").value = 1;
+        if (document.getElementById("pCurahHujan"))
+          document.getElementById("pCurahHujan").value = 1;
+        if (document.getElementById("pDurasiHujan"))
+          document.getElementById("pDurasiHujan").value = 1;
+        if (document.getElementById("pPresipitasi"))
+          document.getElementById("pPresipitasi").value = 1;
+        if (document.getElementById("pHujan3H"))
+          document.getElementById("pHujan3H").value = 5;
+        if (document.getElementById("pHujan7H"))
+          document.getElementById("pHujan7H").value = 14;
+        if (document.getElementById("pAnginMaks"))
+          document.getElementById("pAnginMaks").value = 12;
       }
 
       sliders.forEach((item) => {
@@ -299,14 +536,38 @@ document.addEventListener("DOMContentLoaded", () => {
     predForm.addEventListener("submit", async (e) => {
       e.preventDefault();
 
+      const curahVal = parseFloat(
+        document.getElementById("pCurahHujan")?.value || 15,
+      );
+      const presipVal = parseFloat(
+        document.getElementById("pPresipitasi")?.value || curahVal,
+      );
+
       const payload = {
+        dataset: getSelectedDataset(),
+        kabupaten: document.getElementById("pKabupaten")?.value || "all",
         suhu: parseFloat(document.getElementById("pSuhu").value),
         kelembapan: parseFloat(document.getElementById("pKelembapan").value),
         tutupan_awan: parseFloat(document.getElementById("pAwan").value),
         kecepatan_angin: parseFloat(document.getElementById("pAngin").value),
+        angin_maks: parseFloat(
+          document.getElementById("pAnginMaks")?.value || 18,
+        ),
         kode_cuaca: parseFloat(document.getElementById("pKodeCuaca").value),
         jam: parseFloat(document.getElementById("pJam").value),
         bulan: parseFloat(document.getElementById("pBulan").value),
+        curah_hujan: curahVal,
+        presipitasi: presipVal,
+        durasi_hujan: parseFloat(
+          document.getElementById("pDurasiHujan")?.value || 8,
+        ),
+        hujan_3hari: parseFloat(
+          document.getElementById("pHujan3H")?.value || 35,
+        ),
+        hujan_7hari: parseFloat(
+          document.getElementById("pHujan7H")?.value || 75,
+        ),
+        elevasi: parseFloat(document.getElementById("pElevasi")?.value || 45),
       };
 
       try {
@@ -323,17 +584,20 @@ document.addEventListener("DOMContentLoaded", () => {
         resultBox.classList.remove("hidden");
 
         const pred = result.prediction;
-        const probs = result.probabilities;
+        const probs = result.probabilities || {};
+        const featCount = Array.isArray(result.features_used)
+          ? result.features_used.length
+          : 7;
 
         if (pred === "Tinggi") {
           badgeBox.innerHTML = `
             <div class="status-card tinggi">
               <h2>STATUS: SIAGA BANJIR TINGGI</h2>
               <p>
-                <b>Indikasi Spasial:</b> Tingkat kerawanan genangan dan luapan air tinggi berdasarkan kelembapan jenuh serta intensitas presipitasi.
+                <b>Indikasi Spasial (${result.dataset_key} • ${featCount} Fitur):</b> Tingkat kerawanan genangan dan luapan sungai tinggi berdasarkan akumulasi presipitasi dan kelembapan jenuh.
               </p>
               <p style="font-size: 12px; margin-top: 4px; opacity: 0.9;">
-                Rekomendasi Operasional: Pantau debit sungai utama, siagakan posko darurat, dan pastikan jalur evakuasi warga bebas hambatan.
+                Rekomendasi Operasional: Pantau debit sungai utama, siagakan posko darurat BPBD, dan pastikan jalur evakuasi warga bebas hambatan.
               </p>
             </div>
           `;
@@ -342,7 +606,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="status-card sedang">
               <h2>STATUS: WASPADA BANJIR SEDANG</h2>
               <p>
-                <b>Indikasi Spasial:</b> Potensi genangan pada cekungan drainase rendah akibat kelembapan udara yang meningkat.
+                <b>Indikasi Spasial (${result.dataset_key} • ${featCount} Fitur):</b> Potensi genangan pada cekungan drainase rendah akibat kelembapan udara dan durasi hujan moderat.
               </p>
               <p style="font-size: 12px; margin-top: 4px; opacity: 0.9;">
                 Rekomendasi Operasional: Periksa kelancaran saluran drainase sekunder dan pantau pembaruan data satelit cuaca.
@@ -354,7 +618,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="status-card rendah">
               <h2>STATUS: AMAN DARI RISIKO BANJIR</h2>
               <p>
-                <b>Indikasi Spasial:</b> Parameter atmosfer dan kelembapan berada pada rentang stabil dengan potensi genangan minimal.
+                <b>Indikasi Spasial (${result.dataset_key} • ${featCount} Fitur):</b> Parameter atmosfer dan akumulasi hujan berada pada rentang stabil dengan potensi genangan minimal.
               </p>
               <p style="font-size: 12px; margin-top: 4px; opacity: 0.9;">
                 Rekomendasi Operasional: Kondisi hidrometeorologi kondusif, lanjutkan pemantauan rutin berkala.
@@ -381,14 +645,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 5. CHART.JS ANALYTICS DASHBOARD (Editorial Botanical Palette)
-  let chartKab = null;
-  let chartWeather = null;
-  let chartFI = null;
-
   async function loadAnalytics() {
+    const ds = getSelectedDataset();
     try {
-      const res = await fetch("/api/analytics");
+      const res = await fetch(
+        `/api/analytics?dataset=${encodeURIComponent(ds)}`,
+      );
       const data = await res.json();
 
       Chart.defaults.color = "#5A6451";
@@ -461,6 +723,8 @@ document.addEventListener("DOMContentLoaded", () => {
                   "#B83B2B",
                   "#8C9B7A",
                   "#223018",
+                  "#A36327",
+                  "#6E8458",
                 ],
                 borderWidth: 2,
                 borderColor: "#F3EFE4",
@@ -482,8 +746,11 @@ document.addEventListener("DOMContentLoaded", () => {
       const ctxFI = document.getElementById("chartFeatureImportance");
       if (ctxFI) {
         if (chartFI) chartFI.destroy();
-        const fiKeys = Object.keys(data.feature_importances);
-        const fiVals = Object.values(data.feature_importances);
+        const rawEntries = Object.entries(data.feature_importances || {}).sort(
+          (a, b) => b[1] - a[1],
+        );
+        const fiKeys = rawEntries.map(([k]) => FEATURE_LABELS[k] || k);
+        const fiVals = rawEntries.map(([, v]) => v);
 
         chartFI = new Chart(ctxFI, {
           type: "bar",
@@ -491,7 +758,7 @@ document.addEventListener("DOMContentLoaded", () => {
             labels: fiKeys,
             datasets: [
               {
-                label: "Tingkat Pengaruh Fitur (Feature Importance)",
+                label: `Tingkat Pengaruh Fitur (${data.dataset_key})`,
                 data: fiVals,
                 backgroundColor: "#344726",
                 borderRadius: 8,
@@ -516,24 +783,76 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // 6. DATA TABLE EXPLORER WITH PAGINATION
-  let currentPage = 1;
-
   async function loadTableData(page = 1, search = "") {
-    const kab = document.getElementById("filterKabupaten").value;
-    const risk = document.getElementById("filterRisk").value;
+    const ds = getSelectedDataset();
+    const kab = document.getElementById("filterKabupaten")?.value || "all";
+    const risk = document.getElementById("filterRisk")?.value || "all";
+    const thead = document.getElementById("tableHead");
+    const tbody = document.getElementById("tableBody");
+
+    if (tbody) {
+      tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding: 24px; color: #5A6451;">Memuat data observasi dari ${ds}...</td></tr>`;
+    }
 
     try {
       const res = await fetch(
-        `/api/table-data?page=${page}&limit=12&kabupaten=${kab}&risk=${risk}&search=${encodeURIComponent(search)}`,
+        `/api/table-data?dataset=${encodeURIComponent(ds)}&page=${page}&limit=12&kabupaten=${encodeURIComponent(kab)}&risk=${encodeURIComponent(risk)}&search=${encodeURIComponent(search)}`,
       );
       const data = await res.json();
 
-      const tbody = document.getElementById("tableBody");
+      if (!tbody) return;
       tbody.innerHTML = "";
 
-      if (data.rows.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding: 24px; color: #5A6451;">Tidak ada data yang cocok dengan kriteria pencarian.</td></tr>`;
+      const dsType = data.dataset_type || "csv";
+
+      if (thead) {
+        if (dsType === "xlsx_banjir") {
+          thead.innerHTML = `
+            <tr>
+              <th>Tanggal &amp; Kode</th>
+              <th>Kabupaten/Kota</th>
+              <th>Lokasi &amp; Elevasi</th>
+              <th>Suhu (Rata2 / Min-Maks)</th>
+              <th>Lembap &amp; Awan</th>
+              <th>Hujan &amp; Presipitasi</th>
+              <th>Akumulasi 3H &amp; 7H</th>
+              <th>Dampak Bencana (BNPB)</th>
+              <th>Risiko &amp; Skor</th>
+            </tr>
+          `;
+        } else if (dsType === "xlsx_historis") {
+          thead.innerHTML = `
+            <tr>
+              <th>Tanggal Harian</th>
+              <th>Kabupaten/Kota</th>
+              <th>Grid &amp; Elevasi</th>
+              <th>Suhu (Rata2 / Min-Maks)</th>
+              <th>Lembap &amp; Awan</th>
+              <th>Hujan &amp; Presipitasi</th>
+              <th>Akumulasi 3H &amp; 7H</th>
+              <th>Angin &amp; Cuaca ECMWF</th>
+              <th>Risiko &amp; Skor</th>
+            </tr>
+          `;
+        } else {
+          thead.innerHTML = `
+            <tr>
+              <th>Kabupaten/Kota</th>
+              <th>Kecamatan</th>
+              <th>Desa/Kelurahan</th>
+              <th>Suhu (°C)</th>
+              <th>Kelembapan (%)</th>
+              <th>Awan &amp; Angin</th>
+              <th>Deskripsi Cuaca</th>
+              <th>Risiko Banjir</th>
+              <th>Skor Risiko</th>
+            </tr>
+          `;
+        }
+      }
+
+      if (!data.rows || data.rows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding: 24px; color: #5A6451;">Tidak ada baris yang cocok pada dataset ${ds}. Ubah filter wilayah atau kata kunci pencarian untuk menampilkan data kembali.</td></tr>`;
         return;
       }
 
@@ -547,30 +866,148 @@ document.addEventListener("DOMContentLoaded", () => {
               ? "badge-yellow"
               : "badge-green";
 
-        tr.innerHTML = `
-          <td><b>${r.kabupaten_kota}</b></td>
-          <td>${r.kecamatan}</td>
-          <td>${r.desa_kelurahan}</td>
-          <td>${r.suhu} °C</td>
-          <td>${r.kelembapan}%</td>
-          <td>${r.tutupan_awan}%</td>
-          <td>${r.deskripsi_cuaca}</td>
-          <td><span class="badge ${badgeClass}">${r.kategori_risiko}</span></td>
-          <td><code>${r.risk_score}</code></td>
-        `;
+        if (dsType === "xlsx_banjir") {
+          const penyebabShort =
+            r.penyebab && r.penyebab !== "-"
+              ? `<div style="font-size:11px; color:#5A6451; max-width:210px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${r.penyebab}">${r.penyebab}</div>`
+              : "";
+          tr.innerHTML = `
+            <td>
+              <b>${r.local_datetime}</b>
+              <div style="font-size:11px; color:#5A6451;">ID Kab: ${r.id_kabupaten || "-"}</div>
+            </td>
+            <td>
+              <b>${r.kabupaten_kota}</b>
+              <div style="font-size:11px; color:#5A6451;">${r.kecamatan}</div>
+            </td>
+            <td>
+              <div>${r.desa_kelurahan}</div>
+              <div style="font-size:11px; color:#5A6451;">Elevasi: ${r.elevasi} mdpl</div>
+            </td>
+            <td>
+              <b>${r.suhu} °C</b>
+              <div style="font-size:11px; color:#5A6451;">${r.suhu_min} - ${r.suhu_maks} °C</div>
+            </td>
+            <td>
+              <b>${r.kelembapan}%</b>
+              <div style="font-size:11px; color:#5A6451;">Awan: ${r.tutupan_awan}%</div>
+            </td>
+            <td>
+              <b>${r.curah_hujan} mm</b>
+              <div style="font-size:11px; color:#5A6451;">Presip: ${r.presipitasi} mm (${r.durasi_hujan} jam)</div>
+            </td>
+            <td>
+              <b>3H: ${r.hujan_3hari} mm</b>
+              <div style="font-size:11px; color:#5A6451;">7H: ${r.hujan_7hari} mm • Angin: ${r.angin_maks} km/h</div>
+            </td>
+            <td>
+              <b>${Number(r.rumah_terendam || 0).toLocaleString()} terendam</b>
+              <div style="font-size:11px; color:#5A6451;">${r.rumah_rusak || 0} rusak • ${r.fasum_rusak || 0} fasum</div>
+              ${penyebabShort}
+            </td>
+            <td>
+              <span class="badge ${badgeClass}">${r.kategori_risiko}</span>
+              <div style="margin-top:4px;"><code>Skor: ${r.risk_score}</code></div>
+            </td>
+          `;
+        } else if (dsType === "xlsx_historis") {
+          const floodNote =
+            r.rumah_terendam > 0 || (r.penyebab && !r.penyebab.includes("Tidak ada"))
+              ? `<div style="font-size:11px; color:#B83B2B; font-weight:600;">Banjir BNPB (${Number(r.rumah_terendam || 0).toLocaleString()} rumah)</div>`
+              : `<div style="font-size:11px; color:#5A6451;">${r.deskripsi_cuaca}</div>`;
+          tr.innerHTML = `
+            <td><b>${r.local_datetime}</b></td>
+            <td><b>${r.kabupaten_kota}</b></td>
+            <td>
+              <div>${r.desa_kelurahan}</div>
+              <div style="font-size:11px; color:#5A6451;">Elevasi: ${r.elevasi} mdpl</div>
+            </td>
+            <td>
+              <b>${r.suhu} °C</b>
+              <div style="font-size:11px; color:#5A6451;">${r.suhu_min} - ${r.suhu_maks} °C</div>
+            </td>
+            <td>
+              <b>${r.kelembapan}%</b>
+              <div style="font-size:11px; color:#5A6451;">Awan: ${r.tutupan_awan}%</div>
+            </td>
+            <td>
+              <b>${r.curah_hujan} mm</b>
+              <div style="font-size:11px; color:#5A6451;">Presip: ${r.presipitasi} mm (${r.durasi_hujan} jam)</div>
+            </td>
+            <td>
+              <b>3H: ${r.hujan_3hari} mm</b>
+              <div style="font-size:11px; color:#5A6451;">7H: ${r.hujan_7hari} mm</div>
+            </td>
+            <td>
+              <b>${r.kecepatan_angin} / ${r.angin_maks} km/h</b>
+              ${floodNote}
+            </td>
+            <td>
+              <span class="badge ${badgeClass}">${r.kategori_risiko}</span>
+              <div style="margin-top:4px;"><code>Skor: ${r.risk_score}</code></div>
+            </td>
+          `;
+        } else {
+          tr.innerHTML = `
+            <td><b>${r.kabupaten_kota}</b></td>
+            <td>${r.kecamatan}</td>
+            <td>${r.desa_kelurahan}</td>
+            <td>${r.suhu} °C</td>
+            <td>${r.kelembapan}%</td>
+            <td>${r.tutupan_awan}% • ${r.kecepatan_angin} km/h</td>
+            <td>${r.deskripsi_cuaca}</td>
+            <td><span class="badge ${badgeClass}">${r.kategori_risiko}</span></td>
+            <td><code>${r.risk_score}</code></td>
+          `;
+        }
         tbody.appendChild(tr);
       });
 
       currentPage = data.page;
       document.getElementById("pageInfo").textContent =
-        `Halaman ${data.page} dari ${data.total_pages} (${data.total.toLocaleString()} data)`;
+        `Halaman ${data.page} dari ${data.total_pages} (${data.total.toLocaleString()} data • ${ds})`;
     } catch (err) {
       console.error("Error loading table data:", err);
+      if (tbody) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding: 24px; color: #B83B2B;">Gagal memuat data tabel dari server. Klik Terapkan Filter Spasial untuk mencoba kembali.</td></tr>`;
+      }
     }
   }
 
-  // Event Listeners for Filters & Table
+  async function handleDatasetSwitch(newDataset) {
+    syncDatasetSelectors(newDataset);
+    const kab = document.getElementById("filterKabupaten")?.value || "all";
+    const risk = document.getElementById("filterRisk")?.value || "all";
+    const searchVal = document.getElementById("tableSearch")?.value || "";
+
+    await loadSummary(kab, risk, true);
+    loadMapData(kab, risk);
+    loadAnalytics();
+    loadTableData(1, searchVal);
+
+    const resultBox = document.getElementById("resultBox");
+    if (resultBox && !resultBox.classList.contains("hidden") && predForm) {
+      predForm.dispatchEvent(new Event("submit"));
+    }
+  }
+
+  const filterDatasetEl = document.getElementById("filterDataset");
+  if (filterDatasetEl) {
+    filterDatasetEl.addEventListener("change", (e) => {
+      handleDatasetSwitch(e.target.value);
+    });
+  }
+
+  const topDatasetEl = document.getElementById("topDatasetSelect");
+  if (topDatasetEl) {
+    topDatasetEl.addEventListener("change", (e) => {
+      handleDatasetSwitch(e.target.value);
+    });
+  }
+
   document.getElementById("btnApplyFilter").addEventListener("click", () => {
+    const ds = getSelectedDataset();
+    syncDatasetSelectors(ds);
     const kab = document.getElementById("filterKabupaten").value;
     const risk = document.getElementById("filterRisk").value;
     loadSummary(kab, risk);
@@ -578,7 +1015,6 @@ document.addEventListener("DOMContentLoaded", () => {
     loadTableData(1, document.getElementById("tableSearch").value);
   });
 
-  // KPI Portrait Cards filter the map by risk category when clicked
   document.querySelectorAll("[data-risk-card]").forEach((card) => {
     const activateCardFilter = () => {
       const targetRisk = card.getAttribute("data-risk-card") || "all";
@@ -622,8 +1058,8 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   });
 
-  // Initialize Everything
-  loadSummary();
+  syncDatasetSelectors(currentDataset);
+  loadSummary("all", "all", true);
   initMap();
   loadAnalytics();
   loadTableData();

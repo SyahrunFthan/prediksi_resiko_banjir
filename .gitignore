@@ -48,3 +48,5 @@ htmlcov/
 build/
 dist/
 *.spec
+.agents
+./AGENT.md

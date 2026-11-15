@@ -68,7 +68,7 @@
     <!-- Editorial Stylesheet -->
     <link
       rel="stylesheet"
-      href="{{ url_for('static', filename='css/style.css') }}?v=5"
+      href="{{ url_for('static', filename='css/style.css') }}?v=7"
     />
 
     <!-- Chart.js & Leaflet JS -->
@@ -157,13 +157,33 @@
          2. "RINGKASAN OBSERVASI" - PORTRAIT CARDS ON WARM CREAM (#FAF8F2)
          ===================================================================== -->
     <section id="secRingkasan" class="editorial-section">
-      <div class="editorial-header-center">
+      <div class="editorial-header-center" style="max-width: 760px">
         <h2 class="editorial-heading">RINGKASAN OBSERVASI</h2>
-        <p class="editorial-sub">
+        <p id="summaryDatasetDesc" class="editorial-sub">
           Rekapitulasi pemantauan titik cuaca spasial di seluruh 13 kabupaten
           dan kota Provinsi Sulawesi Tengah beserta klasifikasi kerawanan
           genangan.
         </p>
+
+        <!-- Quick Dataset Switcher Bar -->
+        <div class="dataset-switcher-bar">
+          <label for="topDatasetSelect" class="dataset-switcher-label">
+            Sumber Dataset:
+          </label>
+          <select id="topDatasetSelect" class="editorial-select-light">
+            <option value="dataset_cuaca_sulawesi_tengah.csv">
+              Dataset 1: Observasi Cuaca Desa BMKG
+              (dataset_cuaca_sulawesi_tengah.csv • 39.932 Data)
+            </option>
+            <option value="dataset_cuaca_new.xlsx">
+              Dataset 2: Cuaca Historis Harian &amp; Banjir BNPB
+              (dataset_cuaca_new.xlsx • 31.668 Data)
+            </option>
+          </select>
+          <span id="activeDatasetBadge" class="dataset-meta-pill">
+            BMKG • Akurasi RF: 98.97%
+          </span>
+        </div>
       </div>
 
       <div class="kpi-editorial-grid">
@@ -177,13 +197,17 @@
         >
           <div class="kpi-card-top">
             <span class="kpi-tag">Total Observasi</span>
-            <span class="kpi-pct-pill">13 Wilayah</span>
+            <span id="kpiRegionPill" class="kpi-pct-pill">13 Wilayah</span>
           </div>
           <div id="valTotalData" class="kpi-number">-</div>
           <div class="kpi-card-bottom">
             <div>
-              <div class="kpi-caption">Titik Pantau Cuaca</div>
-              <span class="kpi-subcaption">Cakupan Sulawesi Tengah</span>
+              <div id="kpiTotalCaption" class="kpi-caption">
+                Titik Pantau Cuaca
+              </div>
+              <span id="kpiTotalSubcaption" class="kpi-subcaption"
+                >Cakupan Sulawesi Tengah</span
+              >
             </div>
             <span class="circle-arrow-badge" aria-hidden="true">
               <svg
@@ -313,6 +337,102 @@
           </div>
         </article>
       </div>
+
+      <!-- Dynamic Impact & Meteorological Summary Strip for dataset_cuaca_new.xlsx -->
+      <div
+        id="xlsxImpactBanner"
+        class="hidden mt-6 bg-[#F3EFE4] border border-[#DED9C8] rounded-2xl p-5"
+      >
+        <div
+          class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#DED9C8] pb-3 mb-4"
+        >
+          <div>
+            <span
+              id="xlsxSheetTag"
+              class="text-[11px] font-semibold uppercase tracking-widest text-[#344726]"
+            >
+              FORMAT BARU: SHEET BANJIR_DAN_CUACA (37 KOLOM)
+            </span>
+            <h3
+              class="font-serif text-2xl uppercase tracking-wider text-[#212E18]"
+            >
+              REKAPITULASI DAMPAK BENCANA BNPB &amp; PARAMETER HISTORIS ECMWF
+              IFS
+            </h3>
+          </div>
+          <span
+            class="text-xs font-medium text-[#5A6451] bg-[#FAF8F2] px-3.5 py-1.5 rounded-full border border-[#DED9C8]"
+          >
+            Open-Meteo Historical Weather API • Model ECMWF IFS
+          </span>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="bg-[#FAF8F2] border border-[#DED9C8] rounded-xl p-3.5">
+            <div
+              class="text-[11px] uppercase tracking-wider text-[#5A6451] font-semibold"
+            >
+              Total Rumah Terendam
+            </div>
+            <div
+              id="valRumahTerendam"
+              class="font-serif text-3xl font-semibold text-[#B83B2B] mt-1"
+            >
+              0
+            </div>
+            <div class="text-[11px] text-[#5A6451]">
+              Unit rumah warga terdampak
+            </div>
+          </div>
+          <div class="bg-[#FAF8F2] border border-[#DED9C8] rounded-xl p-3.5">
+            <div
+              class="text-[11px] uppercase tracking-wider text-[#5A6451] font-semibold"
+            >
+              Total Rumah Rusak
+            </div>
+            <div
+              id="valRumahRusak"
+              class="font-serif text-3xl font-semibold text-[#C47A1B] mt-1"
+            >
+              0
+            </div>
+            <div class="text-[11px] text-[#5A6451]">
+              Kerusakan fisik bangunan
+            </div>
+          </div>
+          <div class="bg-[#FAF8F2] border border-[#DED9C8] rounded-xl p-3.5">
+            <div
+              class="text-[11px] uppercase tracking-wider text-[#5A6451] font-semibold"
+            >
+              Fasilitas Umum Rusak
+            </div>
+            <div
+              id="valFasumRusak"
+              class="font-serif text-3xl font-semibold text-[#212E18] mt-1"
+            >
+              0
+            </div>
+            <div class="text-[11px] text-[#5A6451]">
+              Infrastruktur &amp; fasum
+            </div>
+          </div>
+          <div class="bg-[#FAF8F2] border border-[#DED9C8] rounded-xl p-3.5">
+            <div
+              class="text-[11px] uppercase tracking-wider text-[#5A6451] font-semibold"
+            >
+              Rata-rata Curah Hujan
+            </div>
+            <div
+              id="valAvgHujan"
+              class="font-serif text-3xl font-semibold text-[#344726] mt-1"
+            >
+              0 mm
+            </div>
+            <div class="text-[11px] text-[#5A6451]">
+              Intensitas harian saat kejadian
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- =====================================================================
@@ -409,6 +529,18 @@
 
         <!-- Integrated Geospatial Filter Controls -->
         <div class="forest-filter-bar">
+          <div class="filter-field">
+            <label for="filterDataset">Pilih Sumber Dataset Cuaca</label>
+            <select id="filterDataset" class="editorial-select">
+              <option value="dataset_cuaca_sulawesi_tengah.csv">
+                Dataset 1: Cuaca Desa BMKG (dataset_cuaca_sulawesi_tengah.csv)
+              </option>
+              <option value="dataset_cuaca_new.xlsx">
+                Dataset 2: Cuaca Historis &amp; Banjir (dataset_cuaca_new.xlsx)
+              </option>
+            </select>
+          </div>
+
           <div class="filter-field">
             <label for="filterKabupaten">Pilih Wilayah Kabupaten / Kota</label>
             <select id="filterKabupaten" class="editorial-select">
@@ -521,7 +653,7 @@
 
             <button
               type="button"
-              class="btn-forest-pill tab-btn"
+              class="btn-forest-pill tab-btn hover:text-white"
               data-tab="tabPredict"
             >
               <span>Buka Kalkulator Simulasi</span>
@@ -555,6 +687,11 @@
               prediksi tingkat kerawanan banjir menggunakan model Random Forest
               secara real-time.
             </p>
+            <div class="mt-3">
+              <span id="predictModelBadge" class="dataset-meta-pill">
+                Model Aktif: dataset_cuaca_sulawesi_tengah.csv (Akurasi: 98.97%)
+              </span>
+            </div>
           </div>
 
           <!-- Quick Preset Scenarios -->
@@ -645,6 +782,24 @@
                   class="custom-slider"
                 />
               </div>
+
+              <div class="slider-box">
+                <div class="slider-header">
+                  <label for="pCurahHujan">Curah Hujan Harian</label>
+                  <span class="slider-val-pill"
+                    ><span id="valCurahHujanLbl">15</span> mm</span
+                  >
+                </div>
+                <input
+                  type="range"
+                  id="pCurahHujan"
+                  min="0"
+                  max="120"
+                  value="15"
+                  step="1"
+                  class="custom-slider"
+                />
+              </div>
             </div>
 
             <!-- Right Column: Weather Condition, Time & Location -->
@@ -661,9 +816,12 @@
                   <option value="1">1: Cerah Berawan</option>
                   <option value="3">3: Berawan</option>
                   <option value="45">45: Kabut / Asap</option>
+                  <option value="51">51: Gerimis Ringan</option>
                   <option value="61" selected>
                     61: Hujan Ringan / Hujan Sedang
                   </option>
+                  <option value="63">63: Hujan Sedang Berkelanjutan</option>
+                  <option value="65">65: Hujan Lebat</option>
                   <option value="95">95: Hujan Petir / Cuaca Ekstrem</option>
                 </select>
               </div>
@@ -706,12 +864,141 @@
 
               <div class="slider-box">
                 <div class="slider-header">
+                  <label for="pDurasiHujan">Durasi Hujan</label>
+                  <span class="slider-val-pill"
+                    ><span id="valDurasiHujanLbl">8</span> Jam</span
+                  >
+                </div>
+                <input
+                  type="range"
+                  id="pDurasiHujan"
+                  min="0"
+                  max="24"
+                  value="8"
+                  step="1"
+                  class="custom-slider"
+                />
+              </div>
+
+              <div class="slider-box">
+                <div class="slider-header">
                   <label for="pKabupaten">Wilayah Kabupaten Target</label>
                 </div>
                 <select
                   id="pKabupaten"
                   class="editorial-select border border-[#DED9C8]"
                 ></select>
+              </div>
+            </div>
+
+            <!-- Adaptive ECMWF Historical Parameters Block for dataset_cuaca_new.xlsx -->
+            <div
+              id="xlsxSimFields"
+              class="md:col-span-2 hidden bg-[#FAF8F2] border border-[#DED9C8] rounded-2xl p-5 space-y-4"
+            >
+              <div
+                class="border-b border-[#DED9C8] pb-2.5 flex items-center justify-between flex-wrap gap-2"
+              >
+                <span
+                  class="text-xs font-semibold uppercase tracking-widest text-[#344726]"
+                >
+                  Parameter Tambahan Format Baru (Open-Meteo ECMWF IFS)
+                </span>
+                <span class="text-[11px] text-[#5A6451]">
+                  Akumulasi Presipitasi, Hujan 3H/7H Sebelumnya, Angin Maks
+                  &amp; Elevasi Grid
+                </span>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="slider-box">
+                  <div class="slider-header">
+                    <label for="pPresipitasi">Presipitasi Total</label>
+                    <span class="slider-val-pill"
+                      ><span id="valPresipitasiLbl">18</span> mm</span
+                    >
+                  </div>
+                  <input
+                    type="range"
+                    id="pPresipitasi"
+                    min="0"
+                    max="150"
+                    value="18"
+                    step="1"
+                    class="custom-slider"
+                  />
+                </div>
+
+                <div class="slider-box">
+                  <div class="slider-header">
+                    <label for="pHujan3H">Hujan 3 Hari Sebelumnya</label>
+                    <span class="slider-val-pill"
+                      ><span id="valHujan3HLbl">30</span> mm</span
+                    >
+                  </div>
+                  <input
+                    type="range"
+                    id="pHujan3H"
+                    min="0"
+                    max="200"
+                    value="30"
+                    step="1"
+                    class="custom-slider"
+                  />
+                </div>
+
+                <div class="slider-box">
+                  <div class="slider-header">
+                    <label for="pHujan7H">Hujan 7 Hari Sebelumnya</label>
+                    <span class="slider-val-pill"
+                      ><span id="valHujan7HLbl">65</span> mm</span
+                    >
+                  </div>
+                  <input
+                    type="range"
+                    id="pHujan7H"
+                    min="0"
+                    max="320"
+                    value="65"
+                    step="2"
+                    class="custom-slider"
+                  />
+                </div>
+
+                <div class="slider-box">
+                  <div class="slider-header">
+                    <label for="pAnginMaks">Kecepatan Angin Maks</label>
+                    <span class="slider-val-pill"
+                      ><span id="valAnginMaksLbl">22</span> km/h</span
+                    >
+                  </div>
+                  <input
+                    type="range"
+                    id="pAnginMaks"
+                    min="0"
+                    max="60"
+                    value="22"
+                    step="1"
+                    class="custom-slider"
+                  />
+                </div>
+
+                <div class="slider-box md:col-span-2">
+                  <div class="slider-header">
+                    <label for="pElevasi">Elevasi Grid Wilayah (mdpl)</label>
+                    <span class="slider-val-pill"
+                      ><span id="valElevasiLbl">44</span> mdpl</span
+                    >
+                  </div>
+                  <input
+                    type="range"
+                    id="pElevasi"
+                    min="0"
+                    max="800"
+                    value="44"
+                    step="5"
+                    class="custom-slider"
+                  />
+                </div>
               </div>
             </div>
 
@@ -864,13 +1151,20 @@
             </div>
 
             <div class="flex items-center gap-3 flex-wrap">
+              <label for="tableSearch" class="sr-only"
+                >Cari Kabupaten, Kecamatan, atau Desa</label
+              >
               <input
                 type="text"
                 id="tableSearch"
                 placeholder="Cari Kabupaten, Kecamatan, Desa..."
                 class="bg-[#FAF8F2] border border-[#DED9C8] text-[#212E18] text-xs rounded-full px-4 py-2.5 w-64 outline-none focus:border-[#344726] transition"
               />
-              <a href="/api/export-csv" class="btn-forest-pill">
+              <a
+                id="btnExportCsv"
+                href="/api/export-csv"
+                class="btn-forest-pill"
+              >
                 <span>Unduh CSV</span>
                 <span class="arrow-circle" aria-hidden="true">
                   <svg
@@ -894,14 +1188,14 @@
 
           <div class="editorial-table-wrap">
             <table class="editorial-table">
-              <thead>
+              <thead id="tableHead">
                 <tr>
                   <th>Kabupaten/Kota</th>
                   <th>Kecamatan</th>
                   <th>Desa/Kelurahan</th>
                   <th>Suhu (°C)</th>
                   <th>Kelembapan (%)</th>
-                  <th>Awan (%)</th>
+                  <th id="thExtraCol">Awan (%)</th>
                   <th>Deskripsi Cuaca</th>
                   <th>Risiko Banjir</th>
                   <th>Skor Risiko</th>
@@ -953,6 +1247,6 @@
     <script>
       window.MAP_API_KEY = "{{ map_api_key }}";
     </script>
-    <script src="{{ url_for('static', filename='js/main.js') }}?v=5"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}?v=7"></script>
   </body>
 </html>

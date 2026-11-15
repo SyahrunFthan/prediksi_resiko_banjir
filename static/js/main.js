@@ -1,26 +1,39 @@
 // MAIN CLIENT APPLICATION JAVASCRIPT
+// Editorial Botanical Theme ("Regal Crest" Reference Style)
 // Handles Leaflet Map, Charts, Prediction Form & API interactions
 
 document.addEventListener("DOMContentLoaded", () => {
-  // 1. TAB SWITCHING
+  // 1. TAB SWITCHING (Syncs Floating Pill Nav & Workspace Tab Bar)
   const tabButtons = document.querySelectorAll(".tab-btn");
   const tabPanes = document.querySelectorAll(".tab-pane");
 
   tabButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
-      tabButtons.forEach((b) => b.classList.remove("active"));
-      tabPanes.forEach((p) => p.classList.remove("active"));
-
-      btn.classList.add("active");
       const tabId = btn.getAttribute("data-tab");
+      if (!tabId) return;
+
+      tabButtons.forEach((b) => {
+        if (b.getAttribute("data-tab") === tabId) {
+          b.classList.add("active");
+        } else {
+          b.classList.remove("active");
+        }
+      });
+
+      tabPanes.forEach((p) => p.classList.remove("active"));
       const targetPane = document.getElementById(tabId);
       if (targetPane) {
         targetPane.classList.add("active");
       }
 
-      // Re-invalidate Leaflet map size when map tab becomes active
+      const scrollTarget = btn.getAttribute("data-scroll");
+      if (scrollTarget) {
+        const el = document.querySelector(scrollTarget);
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+
       if (tabId === "tabMap" && map) {
-        setTimeout(() => map.invalidateSize(), 200);
+        setTimeout(() => map.invalidateSize(), 220);
       }
     });
   });
@@ -85,7 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // 3. LEAFLET MAP & GEOPANDAS BOUNDARY
+  // 3. LEAFLET MAP & GEOPANDAS BOUNDARY (Botanical / Terrain Aesthetic)
   let map = null;
   let geoJsonLayer = null;
   let markerCluster = null;
@@ -96,11 +109,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     map = L.map("mapContainer", {
       center: [-1.43, 121.4456],
-      zoom: 8,
+      zoom: 7,
       zoomControl: true,
     });
 
-    // Check if Mapbox token exists
     if (window.MAP_API_KEY) {
       L.tileLayer(
         `https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=${window.MAP_API_KEY}`,
@@ -108,15 +120,14 @@ document.addEventListener("DOMContentLoaded", () => {
           attribution:
             '&copy; <a href="https://www.mapbox.com/">Mapbox</a> &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>',
           maxZoom: 18,
-          id: "mapbox/dark-v11",
+          id: "mapbox/outdoors-v12",
           tileSize: 512,
           zoomOffset: -1,
         },
       ).addTo(map);
     } else {
-      // Fallback CartoDB dark tiles
       L.tileLayer(
-        "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+        "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
         {
           attribution: "&copy; OpenStreetMap &copy; CARTO",
           maxZoom: 18,
@@ -134,7 +145,6 @@ document.addEventListener("DOMContentLoaded", () => {
   async function loadMapData(kabupaten = "all", risk = "all") {
     if (!map) return;
 
-    // Fetch GeoPandas GeoJSON Boundary
     if (!geoJsonLayer) {
       try {
         const resB = await fetch("/api/geojson/boundary");
@@ -142,10 +152,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         geoJsonLayer = L.geoJSON(geoJsonData, {
           style: {
-            color: "#38bdf8",
+            color: "#344726",
             weight: 2,
-            fillColor: "#0284c7",
-            fillOpacity: 0.12,
+            fillColor: "#344726",
+            fillOpacity: 0.14,
           },
           onEachFeature: (feature, layer) => {
             const props = feature.properties || {};
@@ -161,7 +171,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    // Fetch Weather Points
     try {
       const resP = await fetch(
         `/api/weather-points?kabupaten=${kabupaten}&risk=${risk}&limit=2000`,
@@ -171,39 +180,39 @@ document.addEventListener("DOMContentLoaded", () => {
       markerCluster.clearLayers();
 
       const colorMap = {
-        Tinggi: "#f43f5e",
-        Sedang: "#f59e0b",
-        Rendah: "#10b981",
+        Tinggi: "#B83B2B",
+        Sedang: "#C47A1B",
+        Rendah: "#344726",
       };
 
       dataP.points.forEach((pt) => {
-        const color = colorMap[pt.kategori_risiko] || "#38bdf8";
+        const color = colorMap[pt.kategori_risiko] || "#344726";
 
         const marker = L.circleMarker([pt.latitude, pt.longitude], {
           radius: 6,
-          color: color,
+          color: "#FAF8F2",
           fillColor: color,
-          fillOpacity: 0.85,
-          weight: 1,
+          fillOpacity: 0.9,
+          weight: 1.5,
         });
 
         const popupHtml = `
-          <div style="font-family: 'Inter', sans-serif; font-size: 13px; color: #f8fafc; min-width: 220px; line-height: 1.5;">
-            <div style="font-size: 14px; font-weight: 700; color: #ffffff; margin-bottom: 2px;">
+          <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; color: #212E18; min-width: 220px; line-height: 1.5;">
+            <div style="font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; color: #212E18; margin-bottom: 2px;">
               ${pt.kecamatan}
             </div>
-            <div style="font-size: 11px; color: #94a3b8; margin-bottom: 8px;">
-              Desa ${pt.desa} • Kab. ${pt.kabupaten}
+            <div style="font-size: 11.5px; color: #5A6451; margin-bottom: 10px;">
+              Desa ${pt.desa} • ${pt.kabupaten}
             </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 12px; background: rgba(255,255,255,0.06); padding: 8px 10px; border-radius: 8px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.08);">
-              <div><span style="color: #94a3b8;">Suhu:</span> <b>${pt.suhu} °C</b></div>
-              <div><span style="color: #94a3b8;">Kelembapan:</span> <b>${pt.kelembapan}%</b></div>
-              <div><span style="color: #94a3b8;">Tutupan Awan:</span> <b>${pt.tutupan_awan}%</b></div>
-              <div><span style="color: #94a3b8;">Kondisi:</span> <b>${pt.cuaca}</b></div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 12px; background: #F3EFE4; padding: 9px 11px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #DED9C8;">
+              <div><span style="color: #5A6451;">Suhu:</span> <b>${pt.suhu} °C</b></div>
+              <div><span style="color: #5A6451;">Lembap:</span> <b>${pt.kelembapan}%</b></div>
+              <div><span style="color: #5A6451;">Awan:</span> <b>${pt.tutupan_awan}%</b></div>
+              <div><span style="color: #5A6451;">Cuaca:</span> <b>${pt.cuaca}</b></div>
             </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px;">
-              <span style="font-size: 11px; color: #94a3b8;">Klasifikasi Risiko:</span>
-              <span style="font-weight: 700; color: ${color}; font-size: 12px; background: ${color}20; border: 1px solid ${color}60; padding: 2px 10px; border-radius: 9999px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #DED9C8; padding-top: 8px;">
+              <span style="font-size: 11px; color: #5A6451;">Status Risiko:</span>
+              <span style="font-weight: 600; color: #FAF8F2; font-size: 11px; background: ${color}; padding: 3px 11px; border-radius: 9999px;">
                 ${pt.kategori_risiko}
               </span>
             </div>
@@ -215,12 +224,11 @@ document.addEventListener("DOMContentLoaded", () => {
         markerCluster.addLayer(marker);
       });
 
-      // Adjust map view based on filter
       if (markerCluster.getLayers().length > 0) {
         if (kabupaten !== "all") {
           map.fitBounds(markerCluster.getBounds().pad(0.15));
         } else {
-          map.setView([-1.43, 121.4456], 8);
+          map.setView([-1.43, 121.4456], 7);
         }
       }
     } catch (e) {
@@ -248,12 +256,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Preset Scenario Buttons
   const predForm = document.getElementById("predictionForm");
 
   document.querySelectorAll(".btn-preset").forEach((btn) => {
     btn.addEventListener("click", () => {
       const preset = btn.getAttribute("data-preset");
+      if (!preset) return;
+
       if (preset === "ekstrem") {
         document.getElementById("pSuhu").value = 23;
         document.getElementById("pKelembapan").value = 96;
@@ -274,14 +283,12 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("pKodeCuaca").value = 0;
       }
 
-      // Update slider display badges
       sliders.forEach((item) => {
         const el = document.getElementById(item.id);
         const lbl = document.getElementById(item.lbl);
         if (el && lbl) lbl.textContent = el.value;
       });
 
-      // Automatically execute prediction form
       if (predForm) {
         predForm.dispatchEvent(new Event("submit"));
       }
@@ -323,10 +330,10 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="status-card tinggi">
               <h2>STATUS: SIAGA BANJIR TINGGI</h2>
               <p>
-                <b>Indikasi Spasial:</b> Tingkat risiko genangan dan luapan air tinggi berdasarkan kelembapan jenuh dan intensitas hujan.
+                <b>Indikasi Spasial:</b> Tingkat kerawanan genangan dan luapan air tinggi berdasarkan kelembapan jenuh serta intensitas presipitasi.
               </p>
               <p style="font-size: 12px; margin-top: 4px; opacity: 0.9;">
-                Rekomendasi Operasional: Pantau debit aliran sungai, bersihkan saluran drainase utama, dan siapkan posko siaga di kawasan rawan longsor/genangan.
+                Rekomendasi Operasional: Pantau debit sungai utama, siagakan posko darurat, dan pastikan jalur evakuasi warga bebas hambatan.
               </p>
             </div>
           `;
@@ -335,10 +342,10 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="status-card sedang">
               <h2>STATUS: WASPADA BANJIR SEDANG</h2>
               <p>
-                <b>Indikasi Spasial:</b> Potensi genangan air pada area tangkapan air rendah. Diperlukan pemantauan berkala.
+                <b>Indikasi Spasial:</b> Potensi genangan pada cekungan drainase rendah akibat kelembapan udara yang meningkat.
               </p>
               <p style="font-size: 12px; margin-top: 4px; opacity: 0.9;">
-                Rekomendasi Operasional: Lakukan pemeriksaan berkala pada saluran air sekunder dan pantau update citra cuaca radar.
+                Rekomendasi Operasional: Periksa kelancaran saluran drainase sekunder dan pantau pembaruan data satelit cuaca.
               </p>
             </div>
           `;
@@ -347,16 +354,15 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="status-card rendah">
               <h2>STATUS: AMAN DARI RISIKO BANJIR</h2>
               <p>
-                <b>Indikasi Spasial:</b> Kondisi atmosfer dan kelembapan stabil, potensi banjir minimal.
+                <b>Indikasi Spasial:</b> Parameter atmosfer dan kelembapan berada pada rentang stabil dengan potensi genangan minimal.
               </p>
               <p style="font-size: 12px; margin-top: 4px; opacity: 0.9;">
-                Rekomendasi Operasional: Kondisi hidrometeorologis kondusif. Pemantauan rutin harian standar.
+                Rekomendasi Operasional: Kondisi hidrometeorologi kondusif, lanjutkan pemantauan rutin berkala.
               </p>
             </div>
           `;
         }
 
-        // Update Progress Bars
         const pT = probs.Tinggi || 0;
         const pS = probs.Sedang || 0;
         const pR = probs.Rendah || 0;
@@ -375,7 +381,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 5. CHART.JS ANALYTICS DASHBOARD
+  // 5. CHART.JS ANALYTICS DASHBOARD (Editorial Botanical Palette)
   let chartKab = null;
   let chartWeather = null;
   let chartFI = null;
@@ -385,10 +391,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const res = await fetch("/api/analytics");
       const data = await res.json();
 
-      Chart.defaults.color = "#94a3b8";
-      Chart.defaults.font.family = "'Inter', sans-serif";
+      Chart.defaults.color = "#5A6451";
+      Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
 
-      // Chart 1: Kabupaten Risk Stacked Bar Chart
       const ctxKab = document.getElementById("chartKabupaten");
       if (ctxKab) {
         if (chartKab) chartKab.destroy();
@@ -398,22 +403,22 @@ document.addEventListener("DOMContentLoaded", () => {
             labels: data.kabupaten_risk.categories,
             datasets: [
               {
-                label: "Tinggi",
+                label: "Tinggi (Siaga)",
                 data: data.kabupaten_risk.tinggi,
-                backgroundColor: "#f43f5e",
-                borderRadius: 4,
+                backgroundColor: "#B83B2B",
+                borderRadius: 6,
               },
               {
-                label: "Sedang",
+                label: "Sedang (Waspada)",
                 data: data.kabupaten_risk.sedang,
-                backgroundColor: "#f59e0b",
-                borderRadius: 4,
+                backgroundColor: "#C47A1B",
+                borderRadius: 6,
               },
               {
-                label: "Rendah",
+                label: "Rendah (Aman)",
                 data: data.kabupaten_risk.rendah,
-                backgroundColor: "#10b981",
-                borderRadius: 4,
+                backgroundColor: "#344726",
+                borderRadius: 6,
               },
             ],
           },
@@ -422,24 +427,23 @@ document.addEventListener("DOMContentLoaded", () => {
             scales: {
               x: {
                 stacked: true,
-                grid: { color: "rgba(255, 255, 255, 0.05)" },
+                grid: { color: "rgba(33, 46, 24, 0.08)" },
               },
               y: {
                 stacked: true,
-                grid: { color: "rgba(255, 255, 255, 0.05)" },
+                grid: { color: "rgba(33, 46, 24, 0.08)" },
               },
             },
             plugins: {
               legend: {
                 position: "top",
-                labels: { color: "#f8fafc", boxWidth: 12, padding: 14 },
+                labels: { color: "#212E18", boxWidth: 12, padding: 14 },
               },
             },
           },
         });
       }
 
-      // Chart 2: Weather Distribution Donut Chart
       const ctxW = document.getElementById("chartWeather");
       if (ctxW) {
         if (chartWeather) chartWeather.destroy();
@@ -451,15 +455,15 @@ document.addEventListener("DOMContentLoaded", () => {
               {
                 data: Object.values(data.weather_distribution),
                 backgroundColor: [
-                  "#38bdf8",
-                  "#10b981",
-                  "#f59e0b",
-                  "#f43f5e",
-                  "#818cf8",
-                  "#ec4899",
+                  "#344726",
+                  "#5C7646",
+                  "#C47A1B",
+                  "#B83B2B",
+                  "#8C9B7A",
+                  "#223018",
                 ],
                 borderWidth: 2,
-                borderColor: "#0f182c",
+                borderColor: "#F3EFE4",
               },
             ],
           },
@@ -468,14 +472,13 @@ document.addEventListener("DOMContentLoaded", () => {
             plugins: {
               legend: {
                 position: "right",
-                labels: { color: "#f8fafc", boxWidth: 12, padding: 12 },
+                labels: { color: "#212E18", boxWidth: 12, padding: 12 },
               },
             },
           },
         });
       }
 
-      // Chart 3: Machine Learning Feature Importance
       const ctxFI = document.getElementById("chartFeatureImportance");
       if (ctxFI) {
         if (chartFI) chartFI.destroy();
@@ -488,10 +491,10 @@ document.addEventListener("DOMContentLoaded", () => {
             labels: fiKeys,
             datasets: [
               {
-                label: "Tingkat Kepentingan Fitur (Feature Importance)",
+                label: "Tingkat Pengaruh Fitur (Feature Importance)",
                 data: fiVals,
-                backgroundColor: "#0284c7",
-                borderRadius: 6,
+                backgroundColor: "#344726",
+                borderRadius: 8,
               },
             ],
           },
@@ -499,11 +502,11 @@ document.addEventListener("DOMContentLoaded", () => {
             indexAxis: "y",
             responsive: true,
             scales: {
-              x: { grid: { color: "rgba(255, 255, 255, 0.05)" } },
+              x: { grid: { color: "rgba(33, 46, 24, 0.08)" } },
               y: { grid: { display: false } },
             },
             plugins: {
-              legend: { labels: { color: "#f8fafc" } },
+              legend: { labels: { color: "#212E18" } },
             },
           },
         });
@@ -530,7 +533,7 @@ document.addEventListener("DOMContentLoaded", () => {
       tbody.innerHTML = "";
 
       if (data.rows.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding: 24px; color: var(--text-secondary);">Tidak ada data yang cocok dengan kriteria pencarian.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding: 24px; color: #5A6451;">Tidak ada data yang cocok dengan kriteria pencarian.</td></tr>`;
         return;
       }
 

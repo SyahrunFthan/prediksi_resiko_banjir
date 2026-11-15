@@ -578,6 +578,30 @@ document.addEventListener("DOMContentLoaded", () => {
     loadTableData(1, document.getElementById("tableSearch").value);
   });
 
+  // KPI Portrait Cards filter the map by risk category when clicked
+  document.querySelectorAll("[data-risk-card]").forEach((card) => {
+    const activateCardFilter = () => {
+      const targetRisk = card.getAttribute("data-risk-card") || "all";
+      const riskSelect = document.getElementById("filterRisk");
+      if (riskSelect) {
+        riskSelect.value = targetRisk;
+      }
+      const kab = document.getElementById("filterKabupaten")?.value || "all";
+      loadSummary(kab, targetRisk);
+      loadMapData(kab, targetRisk);
+      loadTableData(1, document.getElementById("tableSearch")?.value || "");
+      const ws = document.getElementById("secWorkspace");
+      if (ws) ws.scrollIntoView({ behavior: "smooth", block: "start" });
+    };
+    card.addEventListener("click", activateCardFilter);
+    card.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        activateCardFilter();
+      }
+    });
+  });
+
   document.getElementById("tableSearch").addEventListener("input", (e) => {
     loadTableData(1, e.target.value);
   });

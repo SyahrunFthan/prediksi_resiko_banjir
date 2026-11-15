@@ -24,31 +24,31 @@
         theme: {
           extend: {
             fontFamily: {
-              serif: ['"Cormorant Garamond"', 'Georgia', 'serif'],
-              sans: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
+              serif: ['"Cormorant Garamond"', "Georgia", "serif"],
+              sans: ['"Plus Jakarta Sans"', "Inter", "sans-serif"],
             },
             colors: {
               cream: {
-                bg: '#FAF8F2',
-                surface: '#F3EFE4',
-                card: '#EFECE1',
-                border: '#DED9C8',
+                bg: "#FAF8F2",
+                surface: "#F3EFE4",
+                card: "#EFECE1",
+                border: "#DED9C8",
               },
               forest: {
-                DEFAULT: '#344726',
-                dark: '#223018',
-                deep: '#16200F',
-                muted: '#5A6451',
+                DEFAULT: "#344726",
+                dark: "#223018",
+                deep: "#16200F",
+                muted: "#5A6451",
               },
               risk: {
-                high: '#B83B2B',
-                med: '#C47A1B',
-                low: '#344726',
-              }
-            }
-          }
-        }
-      }
+                high: "#B83B2B",
+                med: "#C47A1B",
+                low: "#344726",
+              },
+            },
+          },
+        },
+      };
     </script>
 
     <!-- Leaflet CSS -->
@@ -76,7 +76,9 @@
     <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </head>
-  <body class="bg-[#FAF8F2] text-[#212E18] font-sans antialiased selection:bg-[#344726]/20 selection:text-[#212E18]">
+  <body
+    class="bg-[#FAF8F2] text-[#212E18] font-sans antialiased selection:bg-[#344726]/20 selection:text-[#212E18]"
+  >
     <!-- =====================================================================
          1. HERO SECTION WITH FLOATING CREAM PILL NAVBAR (Reference Top Block)
          ===================================================================== -->
@@ -84,18 +86,36 @@
       <div class="hero-inner">
         <!-- Floating Cream Pill Navigation Bar -->
         <nav class="floating-pill-nav" aria-label="Navigasi Utama">
-          <a href="#secRingkasan" class="pill-nav-btn">Ringkasan</a>
-          <a href="#secFilter" class="pill-nav-btn">Filter Wilayah</a>
-          <button type="button" class="pill-nav-btn tab-btn active" data-tab="tabMap" data-scroll="#secWorkspace">
+          <button
+            type="button"
+            class="pill-nav-btn tab-btn active"
+            data-tab="tabMap"
+            data-scroll="#secWorkspace"
+          >
             Peta Spasial
           </button>
-          <button type="button" class="pill-nav-btn tab-btn" data-tab="tabPredict" data-scroll="#secWorkspace">
+          <button
+            type="button"
+            class="pill-nav-btn tab-btn"
+            data-tab="tabPredict"
+            data-scroll="#secWorkspace"
+          >
             Simulasi Prediksi
           </button>
-          <button type="button" class="pill-nav-btn tab-btn" data-tab="tabAnalytics" data-scroll="#secWorkspace">
+          <button
+            type="button"
+            class="pill-nav-btn tab-btn"
+            data-tab="tabAnalytics"
+            data-scroll="#secWorkspace"
+          >
             Analitik Wilayah
           </button>
-          <button type="button" class="pill-nav-btn tab-btn" data-tab="tabData" data-scroll="#secWorkspace">
+          <button
+            type="button"
+            class="pill-nav-btn tab-btn"
+            data-tab="tabData"
+            data-scroll="#secWorkspace"
+          >
             Eksplorasi Data
           </button>
         </nav>
@@ -105,12 +125,14 @@
           <div class="hero-title-row">
             <span class="hero-flank">PROV.</span>
             <h1 class="hero-display-title">
-              <span class="swash">S</span>ULTENG <span class="swash">G</span>EO&#8209;HYDRO
+              <span class="swash">S</span>ULTENG
+              <span class="swash">G</span>EO&#8209;HYDRO
             </h1>
             <span class="hero-flank">13 KAB/KOTA</span>
           </div>
           <p class="hero-subtitle">
-            sistem analisis geospasial &amp; prediksi risiko banjir sulawesi tengah
+            sistem analisis geospasial &amp; prediksi risiko banjir sulawesi
+            tengah
           </p>
           <div class="hero-cta-wrap">
             <button
@@ -138,13 +160,21 @@
       <div class="editorial-header-center">
         <h2 class="editorial-heading">RINGKASAN OBSERVASI</h2>
         <p class="editorial-sub">
-          Rekapitulasi pemantauan titik cuaca spasial di seluruh 13 kabupaten dan kota Provinsi Sulawesi Tengah beserta klasifikasi kerawanan genangan.
+          Rekapitulasi pemantauan titik cuaca spasial di seluruh 13 kabupaten
+          dan kota Provinsi Sulawesi Tengah beserta klasifikasi kerawanan
+          genangan.
         </p>
       </div>
 
       <div class="kpi-editorial-grid">
         <!-- Card 1: Total Data -->
-        <article class="kpi-portrait-card card-total">
+        <article
+          class="kpi-portrait-card card-total"
+          role="button"
+          tabindex="0"
+          data-risk-card="all"
+          aria-label="Tampilkan semua titik observasi di peta"
+        >
           <div class="kpi-card-top">
             <span class="kpi-tag">Total Observasi</span>
             <span class="kpi-pct-pill">13 Wilayah</span>
@@ -156,7 +186,16 @@
               <span class="kpi-subcaption">Cakupan Sulawesi Tengah</span>
             </div>
             <span class="circle-arrow-badge" aria-hidden="true">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
                 <line x1="5" y1="12" x2="19" y2="12"></line>
                 <polyline points="12 5 19 12 12 19"></polyline>
               </svg>
@@ -165,7 +204,13 @@
         </article>
 
         <!-- Card 2: Risiko Tinggi -->
-        <article class="kpi-portrait-card card-high">
+        <article
+          class="kpi-portrait-card card-high"
+          role="button"
+          tabindex="0"
+          data-risk-card="Tinggi"
+          aria-label="Filter peta untuk Risiko Banjir Tinggi"
+        >
           <div class="kpi-card-top">
             <span class="kpi-tag">Status Siaga</span>
             <span id="pctHighRisk" class="kpi-pct-pill">-</span>
@@ -174,10 +219,21 @@
           <div class="kpi-card-bottom">
             <div>
               <div class="kpi-caption">Risiko Banjir Tinggi</div>
-              <span class="kpi-subcaption">Curah hujan &amp; kelembapan jenuh</span>
+              <span class="kpi-subcaption"
+                >Curah hujan &amp; kelembapan jenuh</span
+              >
             </div>
             <span class="circle-arrow-badge" aria-hidden="true">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
                 <line x1="5" y1="12" x2="19" y2="12"></line>
                 <polyline points="12 5 19 12 12 19"></polyline>
               </svg>
@@ -186,7 +242,13 @@
         </article>
 
         <!-- Card 3: Risiko Sedang -->
-        <article class="kpi-portrait-card card-med">
+        <article
+          class="kpi-portrait-card card-med"
+          role="button"
+          tabindex="0"
+          data-risk-card="Sedang"
+          aria-label="Filter peta untuk Risiko Banjir Sedang"
+        >
           <div class="kpi-card-top">
             <span class="kpi-tag">Status Waspada</span>
             <span id="pctMedRisk" class="kpi-pct-pill">-</span>
@@ -198,7 +260,16 @@
               <span class="kpi-subcaption">Awan tebal &amp; cuaca dinamis</span>
             </div>
             <span class="circle-arrow-badge" aria-hidden="true">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
                 <line x1="5" y1="12" x2="19" y2="12"></line>
                 <polyline points="12 5 19 12 12 19"></polyline>
               </svg>
@@ -207,7 +278,13 @@
         </article>
 
         <!-- Card 4: Risiko Rendah -->
-        <article class="kpi-portrait-card card-low">
+        <article
+          class="kpi-portrait-card card-low"
+          role="button"
+          tabindex="0"
+          data-risk-card="Rendah"
+          aria-label="Filter peta untuk Risiko Banjir Rendah"
+        >
           <div class="kpi-card-top">
             <span class="kpi-tag">Status Normal</span>
             <span id="pctLowRisk" class="kpi-pct-pill">-</span>
@@ -219,7 +296,16 @@
               <span class="kpi-subcaption">Kondisi atmosfer stabil</span>
             </div>
             <span class="circle-arrow-badge" aria-hidden="true">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
                 <line x1="5" y1="12" x2="19" y2="12"></line>
                 <polyline points="12 5 19 12 12 19"></polyline>
               </svg>
@@ -241,7 +327,14 @@
         <!-- 4 Minimalist White Thin-Stroke Icons Grid -->
         <div class="feature-icon-grid">
           <div class="feature-icon-item">
-            <svg class="feature-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <svg
+              class="feature-icon-svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
               <path d="M20 17.58A5 5 0 0 0 18 8h-1.26A8 8 0 1 0 4 16.25"></path>
               <line x1="8" y1="16" x2="8.01" y2="16"></line>
               <line x1="8" y1="20" x2="8.01" y2="20"></line>
@@ -251,33 +344,66 @@
               <line x1="16" y1="20" x2="16.01" y2="20"></line>
             </svg>
             <div class="feature-icon-label">Presipitasi &amp; Tutupan Awan</div>
-            <div class="feature-icon-sub">Pemantauan ketebalan awan konvektif dan kode cuaca ekstrem</div>
+            <div class="feature-icon-sub">
+              Pemantauan ketebalan awan konvektif dan kode cuaca ekstrem
+            </div>
           </div>
 
           <div class="feature-icon-item">
-            <svg class="feature-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <svg
+              class="feature-icon-svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
               <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
             </svg>
             <div class="feature-icon-label">Kelembapan Udara Spesifik</div>
-            <div class="feature-icon-sub">Deteksi kejenuhan uap air di atas ambang batas kritis 85%</div>
+            <div class="feature-icon-sub">
+              Deteksi kejenuhan uap air di atas ambang batas kritis 85%
+            </div>
           </div>
 
           <div class="feature-icon-item">
-            <svg class="feature-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-              <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+            <svg
+              class="feature-icon-svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polygon
+                points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"
+              ></polygon>
               <line x1="8" y1="2" x2="8" y2="18"></line>
               <line x1="16" y1="6" x2="16" y2="22"></line>
             </svg>
             <div class="feature-icon-label">Pemetaan Spasial GeoPandas</div>
-            <div class="feature-icon-sub">1.994 titik desa unik tersebar di 13 wilayah administratif</div>
+            <div class="feature-icon-sub">
+              1.994 titik desa unik tersebar di 13 wilayah administratif
+            </div>
           </div>
 
           <div class="feature-icon-item">
-            <svg class="feature-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"></path>
+            <svg
+              class="feature-icon-svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"
+              ></path>
             </svg>
             <div class="feature-icon-label">Klasifikasi Random Forest</div>
-            <div class="feature-icon-sub">Model prediksi multi-parameter suhu, angin, dan siklus waktu</div>
+            <div class="feature-icon-sub">
+              Model prediksi multi-parameter suhu, angin, dan siklus waktu
+            </div>
           </div>
         </div>
 
@@ -303,7 +429,16 @@
           <button id="btnApplyFilter" type="button" class="btn-pill-with-arrow">
             <span>Terapkan Filter Spasial</span>
             <span class="arrow-circle" aria-hidden="true">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
                 <line x1="5" y1="12" x2="19" y2="12"></line>
                 <polyline points="12 5 19 12 12 19"></polyline>
               </svg>
@@ -345,31 +480,41 @@
 
           <!-- Right: Editorial Title, Description, Legend & CTA -->
           <div class="editorial-side-copy">
-            <span class="text-xs font-semibold uppercase tracking-widest text-[#344726]">
+            <span
+              class="text-xs font-semibold uppercase tracking-widest text-[#344726]"
+            >
               Visualisasi Spasial Interaktif
             </span>
             <h3 class="editorial-heading">PETA SEBARAN RISIKO</h3>
             <p>
-              Peta interaktif menampilkan batas administratif Kabupaten/Kota hasil pemrosesan GeoPandas beserta kluster titik observasi desa di Sulawesi Tengah. Klik pada penanda lokasi untuk melihat rincian suhu, kelembapan, tutupan awan, dan status risiko.
+              Peta interaktif menampilkan batas administratif Kabupaten/Kota
+              hasil pemrosesan GeoPandas beserta kluster titik observasi desa di
+              Sulawesi Tengah. Klik pada penanda lokasi untuk melihat rincian
+              suhu, kelembapan, tutupan awan, dan status risiko.
             </p>
 
             <ul class="legend-editorial-list">
               <li>
                 <span class="legend-dot high"></span>
                 <div>
-                  <strong class="text-[#B83B2B]">Risiko Tinggi (Siaga)</strong>: Kelembapan jenuh (&gt;85%), tutupan awan rapat, dan intensitas hujan tinggi.
+                  <strong class="text-[#B83B2B]">Risiko Tinggi (Siaga)</strong>:
+                  Kelembapan jenuh (&gt;85%), tutupan awan rapat, dan intensitas
+                  hujan tinggi.
                 </div>
               </li>
               <li>
                 <span class="legend-dot med"></span>
                 <div>
-                  <strong class="text-[#C47A1B]">Risiko Sedang (Waspada)</strong>: Kondisi berawan tebal dengan peningkatan kelembapan udara.
+                  <strong class="text-[#C47A1B]">Risiko Sedang (Waspada)</strong
+                  >: Kondisi berawan tebal dengan peningkatan kelembapan udara.
                 </div>
               </li>
               <li>
                 <span class="legend-dot low"></span>
                 <div>
-                  <strong class="text-[#344726]">Risiko Rendah (Aman)</strong>: Cuaca cerah atau berawan ringan dengan potensi genangan rendah.
+                  <strong class="text-[#344726]">Risiko Rendah (Aman)</strong>:
+                  Cuaca cerah atau berawan ringan dengan potensi genangan
+                  rendah.
                 </div>
               </li>
             </ul>
@@ -381,7 +526,16 @@
             >
               <span>Buka Kalkulator Simulasi</span>
               <span class="arrow-circle" aria-hidden="true">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
                   <line x1="5" y1="12" x2="19" y2="12"></line>
                   <polyline points="12 5 19 12 12 19"></polyline>
                 </svg>
@@ -397,7 +551,9 @@
           <div class="editorial-header-center">
             <h3 class="editorial-heading">SIMULASI PREDIKSI</h3>
             <p class="editorial-sub">
-              Sesuaikan parameter meteorologi di bawah ini untuk menguji prediksi tingkat kerawanan banjir menggunakan model Random Forest secara real-time.
+              Sesuaikan parameter meteorologi di bawah ini untuk menguji
+              prediksi tingkat kerawanan banjir menggunakan model Random Forest
+              secara real-time.
             </p>
           </div>
 
@@ -421,7 +577,9 @@
               <div class="slider-box">
                 <div class="slider-header">
                   <label for="pSuhu">Suhu Udara</label>
-                  <span class="slider-val-pill"><span id="valSuhuLbl">27</span> °C</span>
+                  <span class="slider-val-pill"
+                    ><span id="valSuhuLbl">27</span> °C</span
+                  >
                 </div>
                 <input
                   type="range"
@@ -437,7 +595,9 @@
               <div class="slider-box">
                 <div class="slider-header">
                   <label for="pKelembapan">Kelembapan Udara</label>
-                  <span class="slider-val-pill"><span id="valKelembapanLbl">85</span> %</span>
+                  <span class="slider-val-pill"
+                    ><span id="valKelembapanLbl">85</span> %</span
+                  >
                 </div>
                 <input
                   type="range"
@@ -453,7 +613,9 @@
               <div class="slider-box">
                 <div class="slider-header">
                   <label for="pAwan">Tutupan Awan</label>
-                  <span class="slider-val-pill"><span id="valAwanLbl">75</span> %</span>
+                  <span class="slider-val-pill"
+                    ><span id="valAwanLbl">75</span> %</span
+                  >
                 </div>
                 <input
                   type="range"
@@ -469,7 +631,9 @@
               <div class="slider-box">
                 <div class="slider-header">
                   <label for="pAngin">Kecepatan Angin</label>
-                  <span class="slider-val-pill"><span id="valAnginLbl">15</span> km/h</span>
+                  <span class="slider-val-pill"
+                    ><span id="valAnginLbl">15</span> km/h</span
+                  >
                 </div>
                 <input
                   type="range"
@@ -489,12 +653,17 @@
                 <div class="slider-header">
                   <label for="pKodeCuaca">Kondisi Cuaca</label>
                 </div>
-                <select id="pKodeCuaca" class="editorial-select border border-[#DED9C8]">
+                <select
+                  id="pKodeCuaca"
+                  class="editorial-select border border-[#DED9C8]"
+                >
                   <option value="0">0: Cerah</option>
                   <option value="1">1: Cerah Berawan</option>
                   <option value="3">3: Berawan</option>
                   <option value="45">45: Kabut / Asap</option>
-                  <option value="61" selected>61: Hujan Ringan / Hujan Sedang</option>
+                  <option value="61" selected>
+                    61: Hujan Ringan / Hujan Sedang
+                  </option>
                   <option value="95">95: Hujan Petir / Cuaca Ekstrem</option>
                 </select>
               </div>
@@ -502,7 +671,9 @@
               <div class="slider-box">
                 <div class="slider-header">
                   <label for="pJam">Waktu Pemantauan</label>
-                  <span class="slider-val-pill"><span id="valJamLbl">14</span>:00 WITA</span>
+                  <span class="slider-val-pill"
+                    ><span id="valJamLbl">14</span>:00 WITA</span
+                  >
                 </div>
                 <input
                   type="range"
@@ -518,7 +689,9 @@
               <div class="slider-box">
                 <div class="slider-header">
                   <label for="pBulan">Bulan Kalender</label>
-                  <span class="slider-val-pill">Bulan <span id="valBulanLbl">8</span></span>
+                  <span class="slider-val-pill"
+                    >Bulan <span id="valBulanLbl">8</span></span
+                  >
                 </div>
                 <input
                   type="range"
@@ -535,7 +708,10 @@
                 <div class="slider-header">
                   <label for="pKabupaten">Wilayah Kabupaten Target</label>
                 </div>
-                <select id="pKabupaten" class="editorial-select border border-[#DED9C8]"></select>
+                <select
+                  id="pKabupaten"
+                  class="editorial-select border border-[#DED9C8]"
+                ></select>
               </div>
             </div>
 
@@ -544,7 +720,16 @@
               <button type="submit" class="btn-forest-pill px-8 py-3 text-sm">
                 <span>Jalankan Inferensi Prediksi Banjir</span>
                 <span class="arrow-circle" aria-hidden="true">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
                     <line x1="5" y1="12" x2="19" y2="12"></line>
                     <polyline points="12 5 19 12 12 19"></polyline>
                   </svg>
@@ -556,36 +741,60 @@
           <!-- Prediction Output Result Box -->
           <div id="resultBox" class="result-box hidden">
             <div class="border-b border-[#DED9C8] pb-3 mb-5">
-              <h4 class="font-serif text-2xl uppercase tracking-wider text-[#212E18]">
+              <h4
+                class="font-serif text-2xl uppercase tracking-wider text-[#212E18]"
+              >
                 HASIL INFERENSI MODEL MACHINE LEARNING
               </h4>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
               <div id="resBadgeBox" class="result-badge-container"></div>
-              <div class="bg-[#F3EFE4] p-5 rounded-2xl border border-[#DED9C8] space-y-3.5">
-                <h5 class="text-xs uppercase tracking-wider text-[#5A6451] font-semibold mb-2">
+              <div
+                class="bg-[#F3EFE4] p-5 rounded-2xl border border-[#DED9C8] space-y-3.5"
+              >
+                <h5
+                  class="text-xs uppercase tracking-wider text-[#5A6451] font-semibold mb-2"
+                >
                   Distribusi Probabilitas Kategori Risiko:
                 </h5>
-                <div class="grid grid-cols-[80px_1fr_48px] items-center gap-3 text-xs font-medium">
+                <div
+                  class="grid grid-cols-[80px_1fr_48px] items-center gap-3 text-xs font-medium"
+                >
                   <span class="text-[#B83B2B] font-semibold">Tinggi:</span>
                   <div class="progress-bar">
                     <div id="barTinggi" class="progress-fill red"></div>
                   </div>
-                  <span id="valTinggi" class="text-right font-bold text-[#212E18]">0%</span>
+                  <span
+                    id="valTinggi"
+                    class="text-right font-bold text-[#212E18]"
+                    >0%</span
+                  >
                 </div>
-                <div class="grid grid-cols-[80px_1fr_48px] items-center gap-3 text-xs font-medium">
+                <div
+                  class="grid grid-cols-[80px_1fr_48px] items-center gap-3 text-xs font-medium"
+                >
                   <span class="text-[#C47A1B] font-semibold">Sedang:</span>
                   <div class="progress-bar">
                     <div id="barSedang" class="progress-fill yellow"></div>
                   </div>
-                  <span id="valSedang" class="text-right font-bold text-[#212E18]">0%</span>
+                  <span
+                    id="valSedang"
+                    class="text-right font-bold text-[#212E18]"
+                    >0%</span
+                  >
                 </div>
-                <div class="grid grid-cols-[80px_1fr_48px] items-center gap-3 text-xs font-medium">
+                <div
+                  class="grid grid-cols-[80px_1fr_48px] items-center gap-3 text-xs font-medium"
+                >
                   <span class="text-[#344726] font-semibold">Rendah:</span>
                   <div class="progress-bar">
                     <div id="barRendah" class="progress-fill green"></div>
                   </div>
-                  <span id="valRendah" class="text-right font-bold text-[#212E18]">0%</span>
+                  <span
+                    id="valRendah"
+                    class="text-right font-bold text-[#212E18]"
+                    >0%</span
+                  >
                 </div>
               </div>
             </div>
@@ -598,30 +807,40 @@
         <div class="editorial-header-center">
           <h3 class="editorial-heading">ANALITIK GEOSPASIAL</h3>
           <p class="editorial-sub">
-            Distribusi kerawanan banjir per kabupaten, proporsi kondisi cuaca, serta tingkat pengaruh variabel pada model Random Forest.
+            Distribusi kerawanan banjir per kabupaten, proporsi kondisi cuaca,
+            serta tingkat pengaruh variabel pada model Random Forest.
           </p>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div class="editorial-card">
-            <h4 class="font-serif text-2xl uppercase tracking-wider text-[#212E18] mb-4">
+            <h4
+              class="font-serif text-2xl uppercase tracking-wider text-[#212E18] mb-4"
+            >
               SEBARAN RISIKO PER KABUPATEN
             </h4>
             <canvas id="chartKabupaten" class="max-h-80 w-full"></canvas>
           </div>
 
           <div class="editorial-card">
-            <h4 class="font-serif text-2xl uppercase tracking-wider text-[#212E18] mb-4">
+            <h4
+              class="font-serif text-2xl uppercase tracking-wider text-[#212E18] mb-4"
+            >
               DISTRIBUSI KONDISI CUACA
             </h4>
             <canvas id="chartWeather" class="max-h-80 w-full"></canvas>
           </div>
 
           <div class="lg:col-span-2 editorial-card">
-            <h4 class="font-serif text-2xl uppercase tracking-wider text-[#212E18] mb-4">
+            <h4
+              class="font-serif text-2xl uppercase tracking-wider text-[#212E18] mb-4"
+            >
               TINGKAT PENGARUH FITUR (FEATURE IMPORTANCE)
             </h4>
-            <canvas id="chartFeatureImportance" class="max-h-80 w-full"></canvas>
+            <canvas
+              id="chartFeatureImportance"
+              class="max-h-80 w-full"
+            ></canvas>
           </div>
         </div>
       </section>
@@ -629,13 +848,18 @@
       <!-- TAB 4: DATA EXPLORER & EKSPOR -->
       <section id="tabData" class="tab-pane">
         <div class="editorial-card space-y-5">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div
+            class="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+          >
             <div>
-              <h3 class="font-serif text-3xl uppercase tracking-wider text-[#212E18]">
+              <h3
+                class="font-serif text-3xl uppercase tracking-wider text-[#212E18]"
+              >
                 ARSIP DATA OBSERVASI
               </h3>
               <p class="text-xs text-[#5A6451] mt-1">
-                Telusuri rekaman cuaca per desa dan unduh laporan lengkap dalam format CSV.
+                Telusuri rekaman cuaca per desa dan unduh laporan lengkap dalam
+                format CSV.
               </p>
             </div>
 
@@ -649,7 +873,16 @@
               <a href="/api/export-csv" class="btn-forest-pill">
                 <span>Unduh CSV</span>
                 <span class="arrow-circle" aria-hidden="true">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <svg
+                    width="13"
+                    height="13"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
                     <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
                     <polyline points="7 10 12 15 17 10"></polyline>
                     <line x1="12" y1="15" x2="12" y2="3"></line>
@@ -688,7 +921,9 @@
             <button id="btnPrevPage" type="button" class="btn-preset">
               Sebelumnya
             </button>
-            <span id="pageInfo" class="text-xs font-semibold text-[#5A6451]">Halaman 1 dari 1</span>
+            <span id="pageInfo" class="text-xs font-semibold text-[#5A6451]"
+              >Halaman 1 dari 1</span
+            >
             <button id="btnNextPage" type="button" class="btn-preset">
               Selanjutnya
             </button>

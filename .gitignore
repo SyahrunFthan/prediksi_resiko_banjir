@@ -50,3 +50,6 @@ dist/
 *.spec
 .agents
 ./AGENT.md
+
+/docs/LAPORAN_AKHIR_PROYEK.md
+/docs/LAPORAN_AKHIR_PROYEK.tex
